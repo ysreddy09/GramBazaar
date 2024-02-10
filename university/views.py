@@ -80,4 +80,32 @@ def about(request):
 
 
 def purchased_history(request):
-    return render(request, 'purchased_history')
+    return render(request, 'purchased_history.html')
+
+
+def side_nav(request):
+    return render(request, 'side_nav.html')
+
+
+def seller_home(request):
+    return render(request, 'seller_home.html')
+
+
+def add_product(request):
+    return render(request, 'add_product.html')
+
+
+def details(request):
+    return render(request, 'details.html')
+
+
+def products_hist(request):
+    return render(request, 'products_hist.html')
+
+
+def update_seller(request):
+    return render(request, 'update_seller.html')
+
+
+def profile_seller(request):
+    return render(request, 'profile_seller.html')

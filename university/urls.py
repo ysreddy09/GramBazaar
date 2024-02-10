@@ -14,5 +14,12 @@ urlpatterns = [
     path('footer/', views.footer, name='footer'),
     path('about/', views.about, name='about'),
     path('update/', views.update, name='update'),
-    path('purchased_history', views.purchased_history, name='purchased_history'),
+    path('purchased_history/', views.purchased_history, name='purchased_history'),
+    path('side_nav/', views.side_nav, name='side_nav'),
+    path('seller_home/', views.seller_home, name='seller_home'),
+    path('add_product/', views.add_product, name='add_product'),
+    path('details/', views.details, name='details'),
+    path('products_hist/', views.products_hist, name='products_hist'),
+    path('profile_seller/', views.profile_seller, name='profile_seller'),
+    path('update_seller/', views.update_seller, name='update_seller'),
 ]
