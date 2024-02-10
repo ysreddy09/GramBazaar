@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+    <title>Title</title>
+</head>
+<body>
+<div class="profile-container">
+    <div class="profile-details">
+        <!-- Profile Image -->
+        <div class="profile-image-container">
+            <div class="profile-image" id="profileImage">
+                <img src="path/to/default_image.jpg">
+            </div>
+        </div>
+        <!-- Display User Details -->
+        <div class="personal-info">
+            <h2>User Details</h2>
+            <div class="form-group">
+                <label for="firstName">First Name:</label>
+                <span id="firstName">John</span>
+            </div>
+            <div class="form-group">
+                <label for="lastName">Last Name:</label>
+                <span id="lastName">Doe</span>
+            </div>
+            <div class="form-group">
+                <label for="postalCode">Postal Code:</label>
+                <span id="postalCode">123456</span>
+            </div>
+            <div class="form-group">
+                <label for="phoneNumber">Phone Number:</label>
+                <span id="phoneNumber">911234567890</span>
+            </div>
+            <div class="form-group">
+                <label for="address">Address:</label>
+                <span id="address">123 Street, City, Country</span>
+            </div>
+            <!-- Update Button -->
+            <a href="{% url 'update' %}">
+                <button type="button" class="update-btn" >Update</button>
+            </a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
