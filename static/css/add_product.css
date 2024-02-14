@@ -1,6 +1,7 @@
 body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
+             overflow: hidden;
         }
 
         .container {
@@ -57,7 +58,6 @@ body {
     color: #fff;
      /* Add default border */
     border-radius: 4px;
-    cursor: pointer;
 }
 
 .btn:hover {

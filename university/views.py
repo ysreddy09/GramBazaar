@@ -1,5 +1,8 @@
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect
+import io
+from django.http import FileResponse
+from reportlab.pdfgen import canvas
 from .forms import SignUpForm
 from .forms import LoginForm
 
@@ -59,6 +62,51 @@ def products(request):
     return render(request, 'products.html')
 
 
+def generate_pdf(request):
+    # Create a file-like buffer to receive PDF data.
+    buffer = io.BytesIO()
+
+    # Create the PDF object, using the buffer as its "file."
+    p = canvas.Canvas(buffer)
+
+    # Draw content on the PDF.
+    p.drawString(100, 750, "Shopping Cart")
+    p.drawString(100, 700, "Image")
+    p.drawString(200, 700, "Product")
+    p.drawString(350, 700, "Price")
+    p.drawString(450, 700, "Quantity")
+    p.drawString(550, 700, "Total")
+
+    # Example product details (replace with actual data)
+    products = [
+        {"title": "Dingo Dog Bones", "price": "$12.99", "quantity": "2", "total": "$25.98"},
+        {"title": "Nutro™ Adult Lamb and Rice Dog Food", "price": "$45.99", "quantity": "1", "total": "$45.99"},
+        {"title": "Nutro™ Adult Lamb and Rice Dog Food", "price": "$45.99", "quantity": "1", "total": "$45.99"}
+    ]
+    y = 680
+    for product in products:
+        y -= 20
+        p.drawString(100, y, product["title"])
+        p.drawString(350, y, product["price"])
+        p.drawString(450, y, product["quantity"])
+        p.drawString(550, y, product["total"])
+
+    # Add subtotal, tax, shipping, and grand total
+    p.drawString(100, y - 30, "Subtotal: $71.97")
+    p.drawString(100, y - 50, "Tax (5%): $3.60")
+    p.drawString(100, y - 70, "Shipping: $15.00")
+    p.drawString(100, y - 90, "Grand Total: $90.57")
+
+    # Close the PDF object cleanly.
+    p.showPage()
+    p.save()
+
+    # Set the file pointer back to the beginning of the buffer.
+    buffer.seek(0)
+
+    # Return the PDF as a FileResponse.
+    return FileResponse(buffer, as_attachment=True, filename="shopping_cart.pdf")
+
 def add_to_cart(request):
     return render(request, 'add_to_cart.html')
 
@@ -109,3 +157,15 @@ def update_seller(request):
 
 def profile_seller(request):
     return render(request, 'profile_seller.html')
+
+
+def admin_home(request):
+    return render(request, 'admin_home.html')
+
+
+def admin_details(request):
+    return render(request, 'admin_details.html')
+
+
+def admin_side_nav(request):
+    return render(request, 'admin_side_nav.html')

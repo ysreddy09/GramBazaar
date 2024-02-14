@@ -25,7 +25,7 @@
             </div>
             <ul class="sidebar-nav">
                 <li class="sidebar-item">
-                    <a href="{% url 'profile' %}" class="sidebar-link">
+                    <a href="{% url 'profile_seller' %}" class="sidebar-link">
                         <i class="lni lni-user"></i>
                         <span>Profile</span>
                     </a>
@@ -44,10 +44,10 @@
                     </a>
                     <ul id="auth" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
                         <li class="sidebar-item">
-                            <a href="{% url 'details' %}" class="sidebar-link">Buyers</a>
+                            <a href="{% url 'admin_details' %}" class="sidebar-link">Buyers</a>
                         </li>
                         <li class="sidebar-item">
-                            <a href="{% url 'details' %}" class="sidebar-link">Sellers</a>
+                            <a href="{% url 'admin_details' %}" class="sidebar-link">Sellers</a>
                         </li>
                     </ul>
                 </li>

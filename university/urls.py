@@ -22,4 +22,8 @@ urlpatterns = [
     path('products_hist/', views.products_hist, name='products_hist'),
     path('profile_seller/', views.profile_seller, name='profile_seller'),
     path('update_seller/', views.update_seller, name='update_seller'),
+    path('admin_home/', views.admin_home, name='admin_home'),
+    path('admin_side_nav/', views.admin_side_nav, name='admin_side_nav'),
+    path('admin_details/', views.admin_details, name='admin_details'),
+    path('generate-pdf/', views.generate_pdf, name='generate_pdf'),
 ]

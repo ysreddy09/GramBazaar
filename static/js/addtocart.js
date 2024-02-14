@@ -69,3 +69,18 @@
                 recalculateCart();
             });
         }
+
+$(document).ready(function() {
+    // Add click event listener to the checkout button
+    $('#checkoutButton').click(function() {
+        // Send a GET request to the Django view that generates the PDF
+        $.get('/generate-pdf/', function(response) {
+            // Create a blob from the response
+            var blob = new Blob([response]);
+            var link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = 'GramBazaar_bill' + Math.random().toString(36).substring(2, 8) + '.pdf';
+            link.click();
+        });
+    });
+});

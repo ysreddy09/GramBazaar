@@ -66,3 +66,10 @@ button {
 button:hover {
     background-color: #0056b3;
 }
+select {
+    width: 100%;
+    padding: 8px; /* Reduced padding */
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 14px; /* Reduced font size */
+}
