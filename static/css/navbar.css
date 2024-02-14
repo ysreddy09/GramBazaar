@@ -3,7 +3,7 @@
     padding: 0px;
 }
 .navbar {
-    height: 50px;
+    height: 70px;
     background-color:#333;
     display: flex;
     font-family: sans-serif;
@@ -36,7 +36,7 @@
     padding: 0.5rem 1rem;
     color: white;
     font-size: 1rem;
-    width:650px;
+    width:450px;
 }
 .navbar-search button {
     border: none;
