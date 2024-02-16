@@ -6,6 +6,7 @@ h1 {
             display: inline;
         }
 
+
         .row-1 {
             padding-left: 6%;
             padding-right: 6% ;
@@ -24,6 +25,7 @@ h1 {
             width: 35%;
             padding: 1%;
         }
+
 
         .product-card {
             width: 95%;
@@ -82,6 +84,7 @@ h1 {
             color: #f0c14b;
         }
 
+
         .product-card .add-to-cart-button {
             background-color: #007bff;
             color: #fff;
@@ -92,6 +95,7 @@ h1 {
             font-size: 18px;
             transition: background-color 0.3s;
         }
+
 
         .product-card .add-to-cart-button:hover {
             background-color: #0056b3;

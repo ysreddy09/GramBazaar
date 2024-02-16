@@ -34,8 +34,6 @@ margin:0;
             color: white;
             left: 0;
         }
-
-
         .slider .next {
             position: absolute;
             top: 50%;
@@ -47,3 +45,5 @@ margin:0;
             color: white;
             right: 0;
         }
+
+
