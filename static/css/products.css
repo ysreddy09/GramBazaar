@@ -93,6 +93,7 @@ h1 {
             transition: background-color 0.3s;
         }
 
+
         .product-card .add-to-cart-button:hover {
             background-color: #0056b3;
         }
