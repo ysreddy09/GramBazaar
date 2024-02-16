@@ -10,7 +10,7 @@
 </head>
 
 <body>
-    <h1>Products</h1>
+    <h1 class="page-title">Products</h1>
 
      <div class="container">
         <div class="row-1">
@@ -26,7 +26,7 @@
                             lorem blandit .</p>
                         <div class="product-rating" id="rating">
                         </div>
-                        <span class="rating-value" style="display: block;">3.5</span>
+                        <span class="rating-value" style="display: none;">3.5</span>
                         <button class="add-to-cart-button">Add to Cart</button>
                     </div>
                 </div>
@@ -44,7 +44,7 @@
                         <div class="product-rating" id="rating">
                             <!-- Stars will be dynamically generated here -->
                         </div>
-                        <span class="rating-value" style="display: block;">3.5</span>
+                        <span class="rating-value" style="display: none;">3.5</span>
                         <button class="add-to-cart-button">Add to Cart</button>
                     </div>
                 </div>
@@ -62,7 +62,7 @@
                         <div class="product-rating" id="rating">
                             <!-- Stars will be dynamically generated here -->
                         </div>
-                        <span class="rating-value" style="display: block;">3.5</span>
+                        <span class="rating-value" style="display: none;">3.5</span>
                         <button class="add-to-cart-button">Add to Cart</button>
                     </div>
                 </div>
@@ -80,7 +80,7 @@
                         <div class="product-rating" id="rating">
                             <!-- Stars will be dynamically generated here -->
                         </div>
-                        <span class="rating-value" style="display: block;">3.5</span>
+                        <span class="rating-value" style="display: none;">3.5</span>
                         <button class="add-to-cart-button">Add to Cart</button>
                     </div>
                 </div>
@@ -102,7 +102,7 @@
                             lorem blandit .</p>
                         <div class="product-rating" id="rating">
                         </div>
-                        <span class="rating-value" style="display: block;">3.5</span>
+                        <span class="rating-value" style="display: none;">3.5</span>
                         <button class="add-to-cart-button">Add to Cart</button>
                     </div>
                 </div>
@@ -120,7 +120,7 @@
                         <div class="product-rating" id="rating">
                             <!-- Stars will be dynamically generated here -->
                         </div>
-                        <span class="rating-value" style="display: block;">3.5</span>
+                        <span class="rating-value" style="display: none;">3.5</span>
                         <button class="add-to-cart-button">Add to Cart</button>
                     </div>
                 </div>
@@ -135,10 +135,10 @@
                             malesuada,
                             in dictum
                             lorem blandit .</p>
-                        <div class="product-rating" id="rating">
-                            <!-- Stars will be dynamically generated here -->
-                        </div>
-                        <span class="rating-value" style="display: block;">3.5</span>
+                        <div class="product-rating">
+                    <!-- Stars will be dynamically generated here -->
+                </div>
+                <span class="rating-value" style="display: none;">2</span>
                         <button class="add-to-cart-button">Add to Cart</button>
                     </div>
                 </div>
@@ -153,10 +153,10 @@
                             malesuada,
                             in dictum
                             lorem blandit .</p>
-                        <div class="product-rating" id="rating">
-                            <!-- Stars will be dynamically generated here -->
-                        </div>
-                        <span class="rating-value" style="display: block;">3.5</span>
+                        <div class="product-rating">
+                    <!-- Stars will be dynamically generated here -->
+                </div>
+                <span class="rating-value" style="display: none;">2</span>
                         <button class="add-to-cart-button">Add to Cart</button>
                     </div>
                 </div>
@@ -180,27 +180,23 @@
                     div.innerText = text.substring(0, 30) + '...';
                 }
             });
-        // Get the rating value
-        <!--const ratingValue = parseFloat(document.querySelector('.rating-value').innerText);
+        const RatingValues = document.querySelectorAll('.rating-value');
+        RatingValues.forEach(function(span) {
+            const ratingValue = parseFloat(span.innerText);
+            const roundedRating = Math.round(ratingValue);
+            const productRating = span.parentElement.querySelector('.product-rating');
 
-        // Round the rating value to the nearest integer
-        const roundedRating = Math.round(ratingValue);
-
-        // Select the product-rating div
-        const productRating = document.getElementById('rating');
-
-        // Generate stars based on rounded rating
-        for (let i = 0; i < 5; i++) {
-            const star = document.createElement('span');
-            star.classList.add('star');
-            if (i < roundedRating) {
-                star.innerHTML = '&#9733;'; // Filled star
-            } else {
-                star.innerHTML = '&#9734;'; // Empty star
+            for (let i = 0; i < 5; i++) {
+                const star = document.createElement('span');
+                star.classList.add('star');
+                if (i < roundedRating) {
+                    star.innerHTML = '&#9733;'; // Filled star
+                } else {
+                    star.innerHTML = '&#9734;'; // Empty star
+                }
+                productRating.appendChild(star);
             }
-            productRating.appendChild(star);
-
-        }-->
+        });
     </script>
 </body>
 </html>
