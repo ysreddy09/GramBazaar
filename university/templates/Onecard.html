@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Card</title>
+  <style>
+    body {
+  font-family: Arial, sans-serif;
+  margin: 5px;
+  padding: 5px;
+}
+
+.product-card {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  overflow: hidden;
+  width: 20%;
+  height: 500px;
+  padding: 5px;
+  border-radius: 20px;
+  background-color: rgba(168, 32, 218, 0.484);
+
+}
+
+.product-image {
+    width: 90%;
+    height: 50%;
+    padding: 5%;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+.product-details {
+  padding: 10px;
+}
+
+.product-name {
+  font-size: 20px;
+  margin: 0 0 10px;
+}
+
+.product-price {
+  font-size: 18px;
+  font-weight: bold;
+  color: #007bff;
+  margin: 0 0 10px;
+}
+
+.product-description {
+  font-size: 16px;
+  color: #666;
+  margin: 0 0 10px;
+}
+
+.product-rating {
+  margin-bottom: 10px;
+}
+
+.star {
+  color: #f0c14b;
+}
+
+.rating-value {
+  margin-left: 5px;
+}
+
+.add-to-cart-btn {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 5px;
+  height: 40px;
+  font-size: 20px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.add-to-cart-btn:hover {
+  background-color: #0056b3;
+}
+
+  </style>
+</head>
+<body>
+  <div class="product-card">
+    <img src="vegetables.jpg" alt="Product Image" class="product-image">
+    <div class="product-details">
+      <h2 class="product-name">Product Name</h2>
+      <p class="product-price">$XX.XX</p>
+      <p class="product-description">  amet nulla malesuada, in dictum lorem blandit amet nulla malesuada, in dictum lorem blandit .</p>
+      <div class="product-rating">
+        <span class="star">&#9733;</span>
+        <span class="star">&#9733;</span>
+        <span class="star">&#9733;</span>
+        <span class="star">&#9733;</span>
+        <span class="star">&#9734;</span>
+        <span class="rating-value">(4.0)</span>
+      </div>
+      <button class="add-to-cart-btn">Add to Cart</button>
+    </div>
+  </div>
+  <script>
+    const Description = document.querySelectorAll('.product-description');
+    Description.forEach(function(div) {
+    const text = div.innerText;
+    if (text.length > 70) {
+      div.innerText = text.substring(0, 70) + '...';
+    }
+  });
+
+  const ProductName = document.querySelectorAll('.product-name');
+    ProductName.forEach(function(div) {
+    const text = div.innerText;
+    if (text.length > 30) {
+      div.innerText = text.substring(0, 30) + '...';
+    }
+  });
+  </script>
+</body>
+</html>
