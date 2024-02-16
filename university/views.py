@@ -1,10 +1,7 @@
-from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect
 import io
 from django.http import FileResponse
 from reportlab.pdfgen import canvas
-from .forms import SignUpForm
-from .forms import LoginForm
 
 
 def index(request):
@@ -15,35 +12,11 @@ def index(request):
 
 
 def signup(request):
-    if request.method == 'POST':
-        form = SignUpForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('login')
-    else:
-        form = SignUpForm()
-
-    if form.errors:
-        print(form.errors)
-    return render(request, 'signup.html', {'form': form})
+    return render(request, 'signup.html')
 
 
 def login(request):
-    if request.method == 'POST':
-        form = LoginForm(request.POST)
-        if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            user = authenticate(request, username=username, password=password)
-            if user is not None:
-                login(request, user)
-                return redirect('home')
-            else:
-                error_message = "Invalid email or password. Please try again."
-                return render(request, 'login.html', {'form': form, 'error_message': error_message})
-    else:
-        form = LoginForm()
-    return render(request, 'login.html', {'form': form})
+    return render(request, 'login.html')
 
 
 def home(request):
@@ -78,13 +51,13 @@ def generate_pdf(request):
     p.drawString(550, 700, "Total")
 
     # Example product details (replace with actual data)
-    products = [
+    prods = [
         {"title": "Dingo Dog Bones", "price": "$12.99", "quantity": "2", "total": "$25.98"},
         {"title": "Nutro™ Adult Lamb and Rice Dog Food", "price": "$45.99", "quantity": "1", "total": "$45.99"},
         {"title": "Nutro™ Adult Lamb and Rice Dog Food", "price": "$45.99", "quantity": "1", "total": "$45.99"}
     ]
     y = 680
-    for product in products:
+    for product in prods:
         y -= 20
         p.drawString(100, y, product["title"])
         p.drawString(350, y, product["price"])
@@ -106,6 +79,7 @@ def generate_pdf(request):
 
     # Return the PDF as a FileResponse.
     return FileResponse(buffer, as_attachment=True, filename="shopping_cart.pdf")
+
 
 def add_to_cart(request):
     return render(request, 'add_to_cart.html')

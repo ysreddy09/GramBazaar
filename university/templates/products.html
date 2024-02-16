@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Catalog</title>
+    <link rel="stylesheet" href="{% static 'css/products.css' %}">
+</head>
+
+<body>
+    <h1>Products</h1>
+    <div class="container">
+        <div class="row">
+        <div class="product-card">
+        <img src="{% static 'images/cabbage.jpg' %}" alt="Product Image" class="product-image">
+        <div class="product-details">
+            <h2 class="product-name">Product Name</h2>
+            <p class="product-price">$XX.XX</p>
+            <p class="product-description">amet nulla malesuada, in dictum lorem blandit amet nulla malesuada, in dictum
+                lorem blandit .</p>
+            <div class="product-rating" id="rating">
+                <!-- Stars will be dynamically generated here -->
+            </div>
+            <span class="rating-value" style="display: none;">3.5</span>
+            <button class="add-to-cart-btn">Add to Cart</button>
+        </div>
+    </div></div>
+    <div class="row">
+        <div class="product-card">
+        <img src="{% static 'images/cabbage.jpg' %}" alt="Product Image" class="product-image">
+        <div class="product-details">
+            <h2 class="product-name">Product Name</h2>
+            <p class="product-price">$XX.XX</p>
+            <p class="product-description">amet nulla malesuada, in dictum lorem blandit amet nulla malesuada, in dictum
+                lorem blandit .</p>
+            <div class="product-rating" id="rating">
+                <!-- Stars will be dynamically generated here -->
+            </div>
+            <span class="rating-value" style="display: none;">3.5</span>
+            <button class="add-to-cart-btn">Add to Cart</button>
+        </div>
+    </div></div>
+        <div class="row">
+        <div class="product-card">
+        <img src="{% static 'images/cabbage.jpg' %}" alt="Product Image" class="product-image">
+        <div class="product-details">
+            <h2 class="product-name">Product Name</h2>
+            <p class="product-price">$XX.XX</p>
+            <p class="product-description">amet nulla malesuada, in dictum lorem blandit amet nulla malesuada, in dictum
+                lorem blandit .</p>
+            <div class="product-rating" id="rating">
+                <!-- Stars will be dynamically generated here -->
+            </div>
+            <span class="rating-value" style="display: none;">3.5</span>
+            <button class="add-to-cart-btn">Add to Cart</button>
+        </div>
+    </div></div><div class="row">
+        <div class="product-card">
+        <img src="{% static 'images/cabbage.jpg' %}" alt="Product Image" class="product-image">
+        <div class="product-details">
+            <h2 class="product-name">Product Name</h2>
+            <p class="product-price">$XX.XX</p>
+            <p class="product-description">amet nulla malesuada, in dictum lorem blandit amet nulla malesuada, in dictum
+                lorem blandit .</p>
+            <div class="product-rating" id="rating">
+                <!-- Stars will be dynamically generated here -->
+            </div>
+            <span class="rating-value" style="display: none;">3.5</span>
+            <button class="add-to-cart-btn">Add to Cart</button>
+        </div>
+    </div></div>
+        <div class="row">
+        <div class="product-card">
+        <img src="{% static 'images/cabbage.jpg' %}" alt="Product Image" class="product-image">
+        <div class="product-details">
+            <h2 class="product-name">Product Name</h2>
+            <p class="product-price">$XX.XX</p>
+            <p class="product-description">amet nulla malesuada, in dictum lorem blandit amet nulla malesuada, in dictum
+                lorem blandit .</p>
+            <div class="product-rating" id="rating">
+                <!-- Stars will be dynamically generated here -->
+            </div>
+            <span class="rating-value" style="display: none;">3.5</span>
+            <button class="add-to-cart-btn">Add to Cart</button>
+        </div>
+    </div></div>
+        <div class="row">
+        <div class="product-card">
+        <img src="{% static 'images/cabbage.jpg' %}" alt="Product Image" class="product-image">
+        <div class="product-details">
+            <h2 class="product-name">Product Name</h2>
+            <p class="product-price">$XX.XX</p>
+            <p class="product-description">amet nulla malesuada, in dictum lorem blandit amet nulla malesuada, in dictum
+                lorem blandit .</p>
+            <div class="product-rating" id="rating">
+                <!-- Stars will be dynamically generated here -->
+            </div>
+            <span class="rating-value" style="display: none;">3.5</span>
+            <button class="add-to-cart-btn">Add to Cart</button>
+        </div>
+    </div></div>
+
+
+    </div>
+</body>
+    <script>
+        const Description = document.querySelectorAll('.product-description');
+            Description.forEach(function (div) {
+                const text = div.innerText;
+                if (text.length > 50) {
+                    div.innerText = text.substring(0, 50) + '...';
+                }
+            });
+
+            const ProductName = document.querySelectorAll('.product-name');
+            ProductName.forEach(function (div) {
+                const text = div.innerText;
+                if (text.length > 30) {
+                    div.innerText = text.substring(0, 30) + '...';
+                }
+            });
+        // Get the rating value
+        const ratingValue = parseFloat(document.querySelector('.rating-value').innerText);
+
+        // Round the rating value to the nearest integer
+        const roundedRating = Math.round(ratingValue);
+
+        // Select the product-rating div
+        const productRating = document.getElementById('rating');
+
+        // Generate stars based on rounded rating
+        for (let i = 0; i < 5; i++) {
+            const star = document.createElement('span');
+            star.classList.add('star');
+            if (i < roundedRating) {
+                star.innerHTML = '&#9733;'; // Filled star
+            } else {
+                star.innerHTML = '&#9734;'; // Empty star
+            }
+            productRating.appendChild(star);
+        }
+    </script>
+</html>
