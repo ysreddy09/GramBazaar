@@ -1,4 +1,11 @@
+import random
+
 from django.shortcuts import render, redirect
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
+from .models import UserProfile
+from .forms import SignUpForm, LoginForm, ProfileUpdateForm
+from django.contrib.auth.decorators import login_required
 import io
 from django.http import FileResponse
 from reportlab.pdfgen import canvas
@@ -8,15 +15,53 @@ def index(request):
     return render(request, 'index.html')
 
 
-# views.py
-
-
 def signup(request):
-    return render(request, 'signup.html')
+    form = SignUpForm()
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            first_name = form.cleaned_data['first_name']
+            last_name = form.cleaned_data['last_name']
+            role = form.cleaned_data['role']
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+            confirm_password = form.cleaned_data['confirm_password']
+
+            if password != confirm_password:
+                return render(request, 'signup.html', {'form': form, 'error_message': 'Passwords do not match'})
+
+            username = first_name.lower() + str(random.randint(100, 999))
+
+            user = User.objects.create_user(username=username, email=email, password=password)
+            user.first_name = first_name
+            user.last_name = last_name
+            user.save()
+            print("User created:", user)
+
+            pro = UserProfile.objects.create(user=user, roles=role)
+            print("UserProfile created:", pro)
+
+            return redirect('login')
+
+    return render(request, 'signup.html', {'form': form})
 
 
 def login(request):
-    return render(request, 'login.html')
+    form = LoginForm()
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            print(username)
+            print(password)
+            user = authenticate(request, username=username, password=password)
+            print(user)
+            if user is not None:
+                return redirect('home')
+            else:
+                return render(request, 'login.html', {'form': form, 'error_message': 'Invalid email or password.'})
+    return render(request, 'login.html', {'form': form})
 
 
 def home(request):
@@ -39,7 +84,6 @@ def generate_pdf(request):
     # Create a file-like buffer to receive PDF data.
     buffer = io.BytesIO()
 
-    # Create the PDF object, using the buffer as its "file."
     p = canvas.Canvas(buffer)
 
     # Draw content on the PDF.
@@ -85,8 +129,14 @@ def add_to_cart(request):
     return render(request, 'add_to_cart.html')
 
 
+@login_required
 def profile(request):
-    return render(request, 'profile.html')
+    user = request.user
+    user_profile = UserProfile.objects.get(user=user)
+    context = {
+        'user_profile': user_profile
+    }
+    return render(request, 'profile.html', context)
 
 
 def footer(request):
@@ -94,7 +144,44 @@ def footer(request):
 
 
 def update(request):
-    return render(request, 'update.html')
+    if request.method == 'POST':
+        form = ProfileUpdateForm(request.POST, request.FILES)
+        if form.is_valid():
+            first_name = form.cleaned_data['first_name']
+            last_name = form.cleaned_data['last_name']
+            postal_code = form.cleaned_data['postal_code']
+            phone_number = form.cleaned_data['phone_number']
+            address = form.cleaned_data['address']
+            profile_picture = form.cleaned_data['profile_picture']
+
+            # Get or create the user's profile
+            User_profile, created = UserProfile.objects.get_or_create(user=request.user)
+
+            # Update profile fields
+            User_profile.first_name = first_name
+            User_profile.last_name = last_name
+            User_profile.postal_code = postal_code
+            User_profile.phone_number = phone_number
+            User_profile.address = address
+
+            # Update profile picture if provided
+            if profile_picture:
+                User_profile.profile_pic = profile_picture
+
+            User_profile.save()
+            return redirect('profile')
+    else:
+        # If it's a GET request, initialize the form with user data
+        initial_data = {
+            'first_name': request.user.userprofile.first_name,
+            'last_name': request.user.userprofile.last_name,
+            'postal_code': request.user.userprofile.postal_code,
+            'phone_number': request.user.userprofile.phone_number,
+            'address': request.user.userprofile.address,
+        }
+        form = ProfileUpdateForm(initial=initial_data)
+
+    return render(request, 'update.html', {'form': form})
 
 
 def about(request):

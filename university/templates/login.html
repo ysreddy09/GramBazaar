@@ -1,7 +1,6 @@
-{% load static %}
 <!DOCTYPE html>
+{% load static %}
 <html>
-
 <head>
     <title>Login</title>
     <link rel="stylesheet" type="text/css" href="{% static 'css/login.css' %}">
@@ -11,26 +10,25 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bungee+Spice&family=Rubik+Doodle+Shadow&display=swap" rel="stylesheet">
 </head>
-
 <body>
     <div class="login-container">
         <div class="center-content">
             <img src="{% static 'images/grambazaar.jpg' %}" alt="Your Logo">
         </div>
-        <form action="{% url 'home' %}" method="post">
+        <form action="{% url 'login' %}" method="post">
             {% csrf_token %}
             {% if form.errors %}
               <ul>
                 {% for field in form %}
                     {% for error in field.errors %}
-                        <li>{{ field.label }}: {{ error }}</li>
+                        <li>{{ error }}</li>
                     {% endfor %}
                 {% endfor %}
               </ul>
             {% endif %}
             <div class="input-container">
                 <label for="username">Email<i class="fas fa-envelope"></i></label>
-                <input type="text" id="username" name="username" placeholder="Enter your email or username" required>
+                <input type="text" id="username" name="username" placeholder="Enter your email" required>
             </div>
             <div class="input-container">
                 <label for="password">Password <i class="fas fa-lock"></i></label>
@@ -50,5 +48,4 @@
         </div>
     </div>
 </body>
-
 </html>
