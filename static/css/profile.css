@@ -9,19 +9,31 @@ body {
     background-color: #f4f4f4;
     padding: 20px;
 }
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #333; /* Adjust background color as needed */
+    padding: 5px 0;
+}
 
+/* Navbar links styles */
+
+
+/* Profile container styles */
 .profile-container {
     max-width: 550px;
-    margin: 0 auto;
+    margin: 80px auto 20px; /* Adjust margin to accommodate the navbar */
 }
 
 h1 {
     text-align: center;
     margin-bottom: 20px;
-    color: white; /* Make h1 text white */
+    color: white;
 }
 h2{
-color:white;
+  color:white;
 }
 
 .profile-details {
@@ -33,6 +45,7 @@ color:white;
     display: flow;
     flex-wrap: wrap;
     justify-content: space-between;
+    margin:25px;
 }
 
 .profile-image-container {

@@ -7,41 +7,43 @@
     <title>Title</title>
 </head>
 <body>
-<div class="profile-container">
-    <div class="profile-details">
-        <div class="profile-image-container">
-            <div class="profile-image" id="profileImage">
-                <img src="{{ user_profile.profile_pic.url }}">
+    {% if user.is_authenticated %}
+        {% include 'navbar.html' %}
+        <div class="profile-container">
+            <div class="profile-details">
+                <div class="profile-image-container">
+                    <div class="profile-image" id="profileImage">
+                    </div>
+                </div>
+                <div class="personal-info">
+                    <h2>Customer Details</h2>
+                    <div class="form-group">
+                        <label for="firstName">First Name:</label>
+                        <span id="firstName">{{ user.first_name }}</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Last Name:</label>
+                        <span id="lastName">{{ user.last_name }}</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="postalCode">Postal Code:</label>
+                        <span id="postalCode">{{ user_profile.postal_code }}</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="phoneNumber">Phone Number:</label>
+                        <span id="phoneNumber">{{ user_profile.phone_number }}</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Address:</label>
+                        <span id="address">{{ user_profile.address }}</span>
+                    </div>
+                    <!-- Update Button -->
+                    <a href="{% url 'update' %}">
+                        <button type="button" class="update-btn">Edit</button>
+                    </a>
+                </div>
             </div>
         </div>
-        <div class="personal-info">
-            <h2>User Details</h2>
-            <div class="form-group">
-                <label for="firstName">First Name:</label>
-                <span id="firstName">{{ user_profile.user.first_name }}</span>
-            </div>
-            <div class="form-group">
-                <label for="lastName">Last Name:</label>
-                <span id="lastName">{{ user_profile.user.last_name }}</span>
-            </div>
-            <div class="form-group">
-                <label for="postalCode">Postal Code:</label>
-                <span id="postalCode">{{ user_profile.postal_code }}</span>
-            </div>
-            <div class="form-group">
-                <label for="phoneNumber">Phone Number:</label>
-                <span id="phoneNumber">{{ user_profile.phone_number }}</span>
-            </div>
-            <div class="form-group">
-                <label for="address">Address:</label>
-                <span id="address">{{ user_profile.address }}</span>
-            </div>
-            <!-- Update Button -->
-            <a href="{% url 'update' %}">
-                <button type="button" class="update-btn" >Update</button>
-            </a>
-        </div>
-    </div>
-</div>
+    {% endif %}
 </body>
 </html>

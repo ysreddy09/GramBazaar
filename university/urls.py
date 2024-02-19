@@ -6,6 +6,7 @@ urlpatterns = [
     path('signup/', views.signup, name='signup'),
     path('home/', views.home, name='home'),
     path('login/', views.login, name='login'),
+    path('logout/', views.logout, name='logout'),
     path('navbar/', views.navbar, name='navbar'),
     path('home_page_slider/', views.home_page_slider, name='home_page_slider'),
     path('products/', views.navbar, name='products'),
@@ -26,4 +27,5 @@ urlpatterns = [
     path('admin_side_nav/', views.admin_side_nav, name='admin_side_nav'),
     path('admin_details/', views.admin_details, name='admin_details'),
     path('generate-pdf/', views.generate_pdf, name='generate_pdf'),
+
 ]

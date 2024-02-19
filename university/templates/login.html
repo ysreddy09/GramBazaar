@@ -17,17 +17,11 @@
         </div>
         <form action="{% url 'login' %}" method="post">
             {% csrf_token %}
-            {% if form.errors %}
-              <ul>
-                {% for field in form %}
-                    {% for error in field.errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                {% endfor %}
-              </ul>
+            {% if error_message %}
+            <div class="error-message">{{ error_message }}</div>
             {% endif %}
             <div class="input-container">
-                <label for="username">Email<i class="fas fa-envelope"></i></label>
+                <label for="username">Email <i class="fas fa-envelope"></i></label>
                 <input type="text" id="username" name="username" placeholder="Enter your email" required>
             </div>
             <div class="input-container">

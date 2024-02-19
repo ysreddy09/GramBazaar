@@ -2,13 +2,17 @@ import random
 
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, get_user_model
 from .models import UserProfile
 from .forms import SignUpForm, LoginForm, ProfileUpdateForm
-from django.contrib.auth.decorators import login_required
 import io
 from django.http import FileResponse
 from reportlab.pdfgen import canvas
+
+
+def logout(request):
+    request.session.flush()
+    return render(request, 'login.html')
 
 
 def index(request):
@@ -53,11 +57,11 @@ def login(request):
         if form.is_valid():
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
-            print(username)
-            print(password)
             user = authenticate(request, username=username, password=password)
-            print(user)
+            print("User object:", user)
             if user is not None:
+                request.session['user'] = user.username
+                print("user.is_authenticated:", user.is_authenticated)
                 return redirect('home')
             else:
                 return render(request, 'login.html', {'form': form, 'error_message': 'Invalid email or password.'})
@@ -65,7 +69,12 @@ def login(request):
 
 
 def home(request):
-    return render(request, 'home.html')
+    user = None
+    if request.session.get('user'):
+        username = request.session['user']
+        user = User.objects.get(username=username)
+    print(user)
+    return render(request, 'home.html', {'user': user})
 
 
 def navbar(request):
@@ -126,17 +135,25 @@ def generate_pdf(request):
 
 
 def add_to_cart(request):
-    return render(request, 'add_to_cart.html')
+    if 'user' in request.session:
+        username = request.session.get('user')
+        user = User.objects.get(username=username)
+    else:
+        return redirect('login')
+        print(user)
+    return render(request, 'add_to_cart.html', {'user': user})
 
 
-@login_required
 def profile(request):
-    user = request.user
-    user_profile = UserProfile.objects.get(user=user)
-    context = {
-        'user_profile': user_profile
-    }
-    return render(request, 'profile.html', context)
+    if 'user' in request.session:
+        User = get_user_model()
+        username = request.session.get('user')
+        user = User.objects.get(username=username)
+        user_profile = UserProfile.objects.get(user=user)
+        print(user_profile.profile_pic)
+    else:
+        return redirect('login')
+    return render(request, 'profile.html', {'user_profile': user_profile, 'user': user})
 
 
 def footer(request):
@@ -144,52 +161,45 @@ def footer(request):
 
 
 def update(request):
-    if request.method == 'POST':
-        form = ProfileUpdateForm(request.POST, request.FILES)
-        if form.is_valid():
-            first_name = form.cleaned_data['first_name']
-            last_name = form.cleaned_data['last_name']
-            postal_code = form.cleaned_data['postal_code']
-            phone_number = form.cleaned_data['phone_number']
-            address = form.cleaned_data['address']
-            profile_picture = form.cleaned_data['profile_picture']
-
-            # Get or create the user's profile
-            User_profile, created = UserProfile.objects.get_or_create(user=request.user)
-
-            # Update profile fields
-            User_profile.first_name = first_name
-            User_profile.last_name = last_name
-            User_profile.postal_code = postal_code
-            User_profile.phone_number = phone_number
-            User_profile.address = address
-
-            # Update profile picture if provided
-            if profile_picture:
-                User_profile.profile_pic = profile_picture
-
-            User_profile.save()
-            return redirect('profile')
+    if 'user' in request.session:
+        username = request.session['user']
+        user = User.objects.get(username=username)
+        user_profile = UserProfile.objects.get(user=user)
+        if request.method == 'POST':
+            form = ProfileUpdateForm(request.POST, request.FILES)
+            if form.is_valid():
+                user.first_name = form.cleaned_data['first_name']
+                user.last_name = form.cleaned_data['last_name']
+                user_profile.postal_code = form.cleaned_data['postal_code']
+                user_profile.phone_number = form.cleaned_data['phone_number']
+                user_profile.address = form.cleaned_data['address']
+                if 'profile_pic' in request.FILES:
+                    user_profile.profile_pic = request.FILES['profile_pic']
+                user.save()
+                user_profile.save()
+                print(user_profile)
+                return redirect('profile')
     else:
-        # If it's a GET request, initialize the form with user data
-        initial_data = {
-            'first_name': request.user.userprofile.first_name,
-            'last_name': request.user.userprofile.last_name,
-            'postal_code': request.user.userprofile.postal_code,
-            'phone_number': request.user.userprofile.phone_number,
-            'address': request.user.userprofile.address,
-        }
-        form = ProfileUpdateForm(initial=initial_data)
-
-    return render(request, 'update.html', {'form': form})
+        return redirect('login')
+    return render(request, 'update.html', {'user': user, 'user_profile': user_profile})
 
 
 def about(request):
+    if 'user' in request.session:
+        username = request.session.get('user')
+        user = User.objects.get(username=username)
+    else:
+        return redirect('login')
     return render(request, 'about.html')
 
 
 def purchased_history(request):
-    return render(request, 'purchased_history.html')
+    if 'user' in request.session:
+        username = request.session.get('user')
+        user = User.objects.get(username=username)
+    else:
+        return redirect('login')
+    return render(request, 'purchased_history.html', {'user': user})
 
 
 def side_nav(request):

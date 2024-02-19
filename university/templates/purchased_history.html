@@ -5,87 +5,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Catalog</title>
+    <title>Purchased History</title>
     <link rel="stylesheet" href="{% static 'css/product_his.css' %}">
 </head>
 
 <body>
+    {% if user.is_authenticated %}
+        {% include 'navbar.html' %}
         <div class="container">
-            <h1 class="heading" style="text-align: center;">Purchased History</h1>
+           <h1 class="heading" style="text-align: center;">Purchased History</h1>
             <table>
                 <thead>
                     <tr>
                         <th>Product ID</th>
-                        <th>Product Image</th>
                         <th>Product Name</th>
+                        <th>Product Image</th>
                         <th>Product Description</th>
                         <th>Product Price</th>
                         <th>Seller Name</th>
+                         <!-- Added Product Image column -->
                     </tr>
                 </thead>
                 <tbody>
-                    <tr >
-                        <td>12345</td>
-                        <td><img src="bhoomi-program-bhoomi-santhe-cover-image.jpg" alt="Product Image"></td>
-                        <td>Product Name 1</td>
-                        <td>Product Description 1</td>
-                        <td>$100.00</td>
-                        <td>Seller Name 1</td>
-                    </tr>
-                    <tr>
-                        <td>67890</td>
-                        <td><img src="bhoomi-program-bhoomi-santhe-cover-image.jpg" alt="Product Image"></td>
-                        <td>Product Name 2</td>
-                        <td>Product Description 2</td>
-                        <td>$120.00</td>
-                        <td>Seller Name 2</td>
-                    </tr>
-                       <tr>
-                        <td>67890</td>
-                        <td><img src="bhoomi-program-bhoomi-santhe-cover-image.jpg" alt="Product Image"></td>
-                        <td>Product Name 2</td>
-                        <td>Product Description 2</td>
-                        <td>$120.00</td>
-                        <td>Seller Name 2</td>
-                    </tr>
-                       <tr>
-                        <td>67890</td>
-                        <td><img src="bhoomi-program-bhoomi-santhe-cover-image.jpg" alt="Product Image"></td>
-                        <td>Product Name 2</td>
-                        <td>Product Description 2</td>
-                        <td>$120.00</td>
-                        <td>Seller Name 2</td>
-                    </tr>
-                       <tr>
-                        <td>67890</td>
-                        <td><img src="bhoomi-program-bhoomi-santhe-cover-image.jpg" alt="Product Image"></td>
-                        <td>Product Name 2</td>
-                        <td>Product Description 2</td>
-                        <td>$120.00</td>
-                        <td>Seller Name 2</td>
-                    </tr>
-                       <tr>
-                        <td>67890</td>
-                        <td><img src="bhoomi-program-bhoomi-santhe-cover-image.jpg" alt="Product Image"></td>
-                        <td>Product Name 2</td>
-                        <td>Product Description 2</td>
-                        <td>$120.00</td>
-                        <td>Seller Name 2</td>
-                    </tr>
-                       <tr>
-                        <td>67890</td>
-                        <td><img src="bhoomi-program-bhoomi-santhe-cover-image.jpg" alt="Product Image"></td>
-                        <td>Product Name 2</td>
-                        <td>Product Description 2</td>
-                        <td>$120.00</td>
-                        <td>Seller Name 2</td>
-                    </tr>
-
-
-                    <!-- Add more rows for additional products -->
+                    {% for item in purchased_history %}
+                        <tr>
+                            <td>{{ item.product_id }}</td>
+                            <td>{{ item.product_name }}</td>
+                            <td><img src="{{ item.product_image.url }}" alt="Product Image"></td>
+                            <td>{{ item.product_description }}</td>
+                            <td>{{ item.product_price }}</td>
+                            <td>{{ item.seller_name }}</td>
+                        </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
+    {% endif %}
 </body>
 
 </html>
