@@ -15,11 +15,15 @@
         <div class="center-content">
             <img src="{% static 'images/grambazaar.jpg' %}" alt="Your Logo">
         </div>
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
         <form action="{% url 'login' %}" method="post">
             {% csrf_token %}
-            {% if error_message %}
-            <div class="error-message">{{ error_message }}</div>
-            {% endif %}
             <div class="input-container">
                 <label for="username">Email <i class="fas fa-envelope"></i></label>
                 <input type="text" id="username" name="username" placeholder="Enter your email" required>

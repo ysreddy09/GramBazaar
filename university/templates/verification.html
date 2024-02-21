@@ -1,21 +1,24 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Email Verification</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/verification.css' %}">
 </head>
+
 <body>
-    <p>Hello {{ user.first_name }},</p>
-
-    <p>Please click the link below to verify your email address:</p>
-
-    <p><a href="{{ verification_link }}">{{ verification_link }}</a></p>
-
-    <p>If you did not sign up for an account on our website, you can safely ignore this email.</p>
-
-    <p>Thank you,</p>
-    <p>The Example Team</p>
-
-    <p><em>This is an automated message, please do not reply.</em></p>
+    <div id="verification-form">
+        <div id="verification-form-content">
+            <h2>Email Verification</h2>
+            <p>An email has been sent to your mail. Please verify it.</p>
+            <form action="verification" method="post">
+                {% csrf_token %}
+                <button type="submit" id="resend-btn">Resend Mail</button>
+            </form>
+        </div>
+    </div>
 </body>
 </html>

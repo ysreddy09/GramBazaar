@@ -8,6 +8,7 @@ body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;
     padding: 20px;
+    overflow:fixed;
 }
 .navbar {
     position: fixed;
@@ -17,7 +18,11 @@ body {
     background-color: #333; /* Adjust background color as needed */
     padding: 5px 0;
 }
-
+.profile-container {
+    /* ... other styles */
+    z-index: 5;  /* Lower z-index */
+    margin-left: 70px; /* Adjust as needed to accommodate sidebar width */
+}
 /* Navbar links styles */
 
 

@@ -1,10 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
-::after,
-::before {
+* {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    border: 0; /* Adding border: 0; to set border to zero */
 }
 
 a {
@@ -22,14 +22,15 @@ h1 {
 
 body {
     font-family: 'Poppins', sans-serif;
+    margin: 0; /* Reset margin for the body */
+    padding:0;
 }
 
 .wrapper {
-    display: flex;
+        display: -webkit-box;
 }
 
 .main {
-    min-height: 100vh;
     width: 100%;
     overflow: hidden;
     transition: all 0.35s ease-in-out;
@@ -42,8 +43,9 @@ body {
     z-index: 1000;
     transition: all .25s ease-in-out;
     background-color: #0e2238;
-    display: flex;
+
     flex-direction: column;
+    margin: 0; /* Reset margin for the sidebar */
 }
 
 #sidebar.expand {
@@ -139,4 +141,9 @@ a.sidebar-link:hover {
 #sidebar.expand .sidebar-link[data-bs-toggle="collapse"].collapsed::after {
     transform: rotate(45deg);
     transition: all .2s ease-out;
+}
+
+#sidebar {
+    height: -webkit-fill-available;
+    position: fixed; /* Or relative, if appropriate */
 }

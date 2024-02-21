@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -6,12 +7,15 @@
 </head>
 <body>
   {% if user.is_authenticated %}
-    {% include 'navbar.html' %}
-    {% include 'home_page_slider.html' %}
-    {% include 'products.html' %}
-    {% include 'footer.html' %}
-  {% else %}
-    {% include 'login.html' %}
+      {% if user_profile.roles == 'Customer' %}
+         {% include 'navbar.html' %}
+         {% include 'home_page_slider.html' %}
+         {% include 'products.html' %}
+         {% include 'footer.html' %}
+      {% endif %}
+      {% if user_profile.roles == 'Seller' or user_profile.roles == 'Admin' %}
+         {% include 'side_nav.html' %}
+      {% endif %}
   {% endif %}
 </body>
 </html>

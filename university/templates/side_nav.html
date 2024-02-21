@@ -20,7 +20,7 @@
                     <i class="lni lni-grid-alt"></i>
                 </button>
                 <div class="sidebar-logo">
-                    <a href="{% url 'seller_home' %}">GramBazaar</a>
+                    <a href="{% url 'home' %}">GramBazaar</a>
                 </div>
             </div>
             <ul class="sidebar-nav">
@@ -44,10 +44,10 @@
                     </a>
                     <ul id="auth" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
                         <li class="sidebar-item">
-                            <a href="{% url 'details' %}" class="sidebar-link">Buyers</a>
+                            <a href="{% url 'details' type='Buyer' %}" class="sidebar-link">Buyers</a>
                         </li>
                         <li class="sidebar-item">
-                            <a href="{% url 'details' %}" class="sidebar-link">Sellers</a>
+                            <a href="{% url 'details' type='Seller' %}" class="sidebar-link">Buyers</a>
                         </li>
                     </ul>
                 </li>

@@ -6,10 +6,8 @@ from django.core.mail import send_mail
 from django.shortcuts import render, redirect, reverse
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, get_user_model
-from django.template.loader import render_to_string
-from django.utils.encoding import force_bytes, force_text
+from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-
 from .models import UserProfile
 from .forms import SignUpForm, LoginForm, ProfileUpdateForm
 import io
@@ -29,12 +27,17 @@ def index(request):
 def send_verification_email(request, user, verification_link):
     current_site = get_current_site(request)
     subject = 'Verify your email address'
-    message = render_to_string('verification.html', {
-        'user': user,
-        'verification_link': verification_link,
-        'domain': current_site.domain
-    })
+    message = f'Hello {user.username},\n\n' \
+              f'Please click the link below to verify your email address:\n\n' \
+              f'{verification_link}\n\n' \
+              f'If you did not sign up for an account on our website, you can safely ignore this email.\n\n' \
+              f'Thank you,\n' \
+              f'The Example Team\n\n' \
+              f'This is an automated message, please do not reply.'
+
     send_mail(subject, message, 'yaswanth2813@gmail.com', [user.email])
+
+    # Set session variables if needed
     request.session['user_id'] = user.id
     request.session['verification_link'] = verification_link
 
@@ -91,7 +94,7 @@ def signup(request):
             domain = get_current_site(request).domain
             verification_link = f'http://{domain}{reverse("verify_email", kwargs={"uidb64": uidb64, "token": token})}'
             send_verification_email(request, user, verification_link)
-            return redirect('login')
+            return redirect('verification')
     else:
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form})
@@ -104,28 +107,34 @@ def login(request):
         if form.is_valid():
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
+
             user = authenticate(request, username=username, password=password)
+            if user is None:
+                # Attempt authentication with email
+                try:
+                    from django.contrib.auth import get_user_model
+                    User = get_user_model()
+                    user = User.objects.get(email=username)
+                    user = authenticate(request, username=user.username, password=password)
+                except User.DoesNotExist:
+                    pass
+
             if user is not None:
                 request.session['user'] = user.username
-                user_profile = UserProfile.objects.get(user=user)
-
-                if user_profile.roles == 'Admin':
-                    return redirect('admin_details')
-                elif user_profile.roles == 'Seller':
-                    return redirect('seller_home')
-                elif user_profile.roles == 'Customer':
-                    return redirect('home')
+                return redirect('home')
             else:
                 return render(request, 'login.html', {'form': form, 'error_message': 'Invalid email or password.'})
     return render(request, 'login.html', {'form': form})
 
 
 def home(request):
-    user = None
-    if request.session.get('user'):
-        username = request.session['user']
+    if 'user' in request.session:
+        username = request.session.get('user')
         user = User.objects.get(username=username)
-    return render(request, 'home.html', {'user': user})
+        user_profile = UserProfile.objects.get(user=user)
+    else:
+        redirect('login')
+    return render(request, 'home.html', {'user': user, 'user_profile': user_profile})
 
 
 def navbar(request):
@@ -140,58 +149,14 @@ def products(request):
     return render(request, 'products.html')
 
 
-def generate_pdf(request):
-    # Create a file-like buffer to receive PDF data.
-    buffer = io.BytesIO()
-
-    p = canvas.Canvas(buffer)
-
-    # Draw content on the PDF.
-    p.drawString(100, 750, "Shopping Cart")
-    p.drawString(100, 700, "Image")
-    p.drawString(200, 700, "Product")
-    p.drawString(350, 700, "Price")
-    p.drawString(450, 700, "Quantity")
-    p.drawString(550, 700, "Total")
-
-    # Example product details (replace with actual data)
-    prods = [
-        {"title": "Dingo Dog Bones", "price": "$12.99", "quantity": "2", "total": "$25.98"},
-        {"title": "Nutro™ Adult Lamb and Rice Dog Food", "price": "$45.99", "quantity": "1", "total": "$45.99"},
-        {"title": "Nutro™ Adult Lamb and Rice Dog Food", "price": "$45.99", "quantity": "1", "total": "$45.99"}
-    ]
-    y = 680
-    for product in prods:
-        y -= 20
-        p.drawString(100, y, product["title"])
-        p.drawString(350, y, product["price"])
-        p.drawString(450, y, product["quantity"])
-        p.drawString(550, y, product["total"])
-
-    # Add subtotal, tax, shipping, and grand total
-    p.drawString(100, y - 30, "Subtotal: $71.97")
-    p.drawString(100, y - 50, "Tax (5%): $3.60")
-    p.drawString(100, y - 70, "Shipping: $15.00")
-    p.drawString(100, y - 90, "Grand Total: $90.57")
-
-    # Close the PDF object cleanly.
-    p.showPage()
-    p.save()
-
-    # Set the file pointer back to the beginning of the buffer.
-    buffer.seek(0)
-
-    # Return the PDF as a FileResponse.
-    return FileResponse(buffer, as_attachment=True, filename="shopping_cart.pdf")
-
-
 def add_to_cart(request):
     if 'user' in request.session:
         username = request.session.get('user')
         user = User.objects.get(username=username)
+        user_profile = UserProfile.objects.get(user=user)
     else:
         return redirect('login')
-    return render(request, 'add_to_cart.html', {'user': user})
+    return render(request, 'add_to_cart.html', {'user': user, 'user_profile': user_profile})
 
 
 def profile(request):
@@ -237,9 +202,10 @@ def about(request):
     if 'user' in request.session:
         username = request.session.get('user')
         user = User.objects.get(username=username)
+        user_profile = UserProfile.objects.get(user=user)
     else:
         return redirect('login')
-    return render(request, 'about.html')
+    return render(request, 'about.html', {'user': user, 'user_profile': user_profile})
 
 
 def purchased_history(request):
@@ -255,16 +221,18 @@ def side_nav(request):
     return render(request, 'side_nav.html')
 
 
-def seller_home(request):
-    return render(request, 'seller_home.html')
-
-
 def add_product(request):
     return render(request, 'add_product.html')
 
 
 def details(request):
-    return render(request, 'details.html')
+    if 'user' in request.session:
+        username = request.session.get('user')
+        user = User.objects.get(username=username)
+        user_profile = UserProfile.objects.get(user=user)
+    else:
+        return redirect('login')
+    return render(request, 'details.html', {'user': user, 'user_profile': user_profile})
 
 
 def products_hist(request):
@@ -279,18 +247,6 @@ def profile_seller(request):
     return render(request, 'profile_seller.html')
 
 
-def admin_home(request):
-    return render(request, 'admin_home.html')
-
-
-def admin_details(request):
-    return render(request, 'admin_details.html')
-
-
-def admin_side_nav(request):
-    return render(request, 'admin_side_nav.html')
-
-
 def verification(request):
     # Retrieve user and verification link from session
     user_id = request.session.get('user_id')
@@ -301,3 +257,48 @@ def verification(request):
 
     # Render the verification template with user and verification link
     return render(request, 'verification.html', {'user': user, 'verification_link': verification_link})
+
+
+def generate_pdf(request):
+    # Create a file-like buffer to receive PDF data.
+    buffer = io.BytesIO()
+
+    p = canvas.Canvas(buffer)
+
+    # Draw content on the PDF.
+    p.drawString(100, 750, "Shopping Cart")
+    p.drawString(100, 700, "Image")
+    p.drawString(200, 700, "Product")
+    p.drawString(350, 700, "Price")
+    p.drawString(450, 700, "Quantity")
+    p.drawString(550, 700, "Total")
+
+    # Example product details (replace with actual data)
+    prods = [
+        {"title": "Dingo Dog Bones", "price": "$12.99", "quantity": "2", "total": "$25.98"},
+        {"title": "Nutro™ Adult Lamb and Rice Dog Food", "price": "$45.99", "quantity": "1", "total": "$45.99"},
+        {"title": "Nutro™ Adult Lamb and Rice Dog Food", "price": "$45.99", "quantity": "1", "total": "$45.99"}
+    ]
+    y = 680
+    for product in prods:
+        y -= 20
+        p.drawString(100, y, product["title"])
+        p.drawString(350, y, product["price"])
+        p.drawString(450, y, product["quantity"])
+        p.drawString(550, y, product["total"])
+
+    # Add subtotal, tax, shipping, and grand total
+    p.drawString(100, y - 30, "Subtotal: $71.97")
+    p.drawString(100, y - 50, "Tax (5%): $3.60")
+    p.drawString(100, y - 70, "Shipping: $15.00")
+    p.drawString(100, y - 90, "Grand Total: $90.57")
+
+    # Close the PDF object cleanly.
+    p.showPage()
+    p.save()
+
+    # Set the file pointer back to the beginning of the buffer.
+    buffer.seek(0)
+
+    # Return the PDF as a FileResponse.
+    return FileResponse(buffer, as_attachment=True, filename="shopping_cart.pdf")

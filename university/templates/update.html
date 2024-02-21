@@ -8,7 +8,11 @@
 </head>
 <body>
     {% if user.is_authenticated %}
-     {% include 'navbar.html' %}
+        {% if user_profile.roles == 'Customer' %}
+             {% include 'navbar.html' %}
+        {% elif user_profile.roles == 'Seller' %}
+             {% include 'side_nav.html' %}
+        {% endif %}
         <form class="personal-info-form" method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="profile-container">

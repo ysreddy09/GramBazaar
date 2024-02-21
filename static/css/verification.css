@@ -1,0 +1,33 @@
+ body {
+            font-family: Arial, sans-serif;
+            background-color: #fff;
+            color: #e4e4e4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #verification-form {
+            max-width: 400px;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            border: 2px solid #000;
+            /* Black border */
+        }
+
+        #verification-form-content {
+            background-color: #000000;
+            /* Black background inside the border */
+            padding: 20px;
+            border-radius: 3px;
+        }
+
+        #resend-link {
+            color: #fff;
+            text-decoration: underline;
+            cursor: pointer;
+        }
