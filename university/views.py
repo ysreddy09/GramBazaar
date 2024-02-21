@@ -1,8 +1,15 @@
 import random
-
-from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.mail import send_mail
+from django.shortcuts import render, redirect, reverse
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, get_user_model
+from django.template.loader import render_to_string
+from django.utils.encoding import force_bytes, force_text
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+
 from .models import UserProfile
 from .forms import SignUpForm, LoginForm, ProfileUpdateForm
 import io
@@ -19,6 +26,41 @@ def index(request):
     return render(request, 'index.html')
 
 
+def send_verification_email(request, user, verification_link):
+    current_site = get_current_site(request)
+    subject = 'Verify your email address'
+    message = render_to_string('verification.html', {
+        'user': user,
+        'verification_link': verification_link,
+        'domain': current_site.domain
+    })
+    send_mail(subject, message, 'yaswanth2813@gmail.com', [user.email])
+    request.session['user_id'] = user.id
+    request.session['verification_link'] = verification_link
+
+    return redirect('verification')
+
+
+def verify_email(request, uidb64, token):
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user is not None and default_token_generator.check_token(user, token):
+        user_profile = UserProfile.objects.get(user=user)
+        user_profile.is_verified = True
+        user.is_active = True
+        user_profile.save()
+        user.save()
+        messages.success(request, 'Your email has been successfully verified.')
+    else:
+        messages.error(request, 'Failed to verify your email.')
+
+    return redirect('login')
+
+
 def signup(request):
     form = SignUpForm()
     if request.method == 'POST':
@@ -26,7 +68,7 @@ def signup(request):
         if form.is_valid():
             first_name = form.cleaned_data['first_name']
             last_name = form.cleaned_data['last_name']
-            role = form.cleaned_data['role']
+            roles = form.cleaned_data['roles']
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
             confirm_password = form.cleaned_data['confirm_password']
@@ -34,19 +76,24 @@ def signup(request):
             if password != confirm_password:
                 return render(request, 'signup.html', {'form': form, 'error_message': 'Passwords do not match'})
 
-            username = first_name.lower() + str(random.randint(100, 999))
-
+            username = first_name.lower() + str(random.randint(1000, 9999))
+            while User.objects.filter(username=username).exists():
+                username = first_name.lower() + str(random.randint(1000, 9999))
             user = User.objects.create_user(username=username, email=email, password=password)
             user.first_name = first_name
             user.last_name = last_name
+            user.is_active = False
             user.save()
-            print("User created:", user)
-
-            pro = UserProfile.objects.create(user=user, roles=role)
-            print("UserProfile created:", pro)
-
+            user_profile = UserProfile(user=user, roles=roles)
+            user_profile.save()
+            uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+            token = default_token_generator.make_token(user)
+            domain = get_current_site(request).domain
+            verification_link = f'http://{domain}{reverse("verify_email", kwargs={"uidb64": uidb64, "token": token})}'
+            send_verification_email(request, user, verification_link)
             return redirect('login')
-
+    else:
+        form = SignUpForm()
     return render(request, 'signup.html', {'form': form})
 
 
@@ -58,11 +105,16 @@ def login(request):
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
             user = authenticate(request, username=username, password=password)
-            print("User object:", user)
             if user is not None:
                 request.session['user'] = user.username
-                print("user.is_authenticated:", user.is_authenticated)
-                return redirect('home')
+                user_profile = UserProfile.objects.get(user=user)
+
+                if user_profile.roles == 'Admin':
+                    return redirect('admin_details')
+                elif user_profile.roles == 'Seller':
+                    return redirect('seller_home')
+                elif user_profile.roles == 'Customer':
+                    return redirect('home')
             else:
                 return render(request, 'login.html', {'form': form, 'error_message': 'Invalid email or password.'})
     return render(request, 'login.html', {'form': form})
@@ -73,7 +125,6 @@ def home(request):
     if request.session.get('user'):
         username = request.session['user']
         user = User.objects.get(username=username)
-    print(user)
     return render(request, 'home.html', {'user': user})
 
 
@@ -140,7 +191,6 @@ def add_to_cart(request):
         user = User.objects.get(username=username)
     else:
         return redirect('login')
-        print(user)
     return render(request, 'add_to_cart.html', {'user': user})
 
 
@@ -177,7 +227,6 @@ def update(request):
                     user_profile.profile_pic = request.FILES['profile_pic']
                 user.save()
                 user_profile.save()
-                print(user_profile)
                 return redirect('profile')
     else:
         return redirect('login')
@@ -240,3 +289,15 @@ def admin_details(request):
 
 def admin_side_nav(request):
     return render(request, 'admin_side_nav.html')
+
+
+def verification(request):
+    # Retrieve user and verification link from session
+    user_id = request.session.get('user_id')
+    verification_link = request.session.get('verification_link')
+
+    # Get the user object using the user_id
+    user = User.objects.get(id=user_id)
+
+    # Render the verification template with user and verification link
+    return render(request, 'verification.html', {'user': user, 'verification_link': verification_link})

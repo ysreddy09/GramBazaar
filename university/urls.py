@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .views import verify_email
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -27,5 +28,6 @@ urlpatterns = [
     path('admin_side_nav/', views.admin_side_nav, name='admin_side_nav'),
     path('admin_details/', views.admin_details, name='admin_details'),
     path('generate-pdf/', views.generate_pdf, name='generate_pdf'),
-
+    path('verification/', views.verification, name='verification'),
+    path('verify_email/<uidb64>/<token>/', verify_email, name='verify_email'),
 ]

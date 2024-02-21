@@ -10,6 +10,7 @@ class UserProfile(models.Model):
     postal_code = models.CharField(max_length=20, blank=True)
     roles = models.CharField(max_length=20,
                              choices=(('Admin', 'Admin'), ('Seller', 'Seller'), ('Customer', 'Customer')))
+    is_verified = models.BooleanField(default=False)
 
 
 class Product(models.Model):

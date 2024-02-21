@@ -4,7 +4,7 @@ from django import forms
 class SignUpForm(forms.Form):
     first_name = forms.CharField(max_length=100)
     last_name = forms.CharField(max_length=100)
-    role = forms.ChoiceField(choices=(('customer', 'Customer'), ('seller', 'Seller')))
+    roles = forms.ChoiceField(choices=(('Customer', 'Customer'), ('Seller', 'Seller')))
     email = forms.EmailField()
     password = forms.CharField(widget=forms.PasswordInput)
     confirm_password = forms.CharField(widget=forms.PasswordInput)
