@@ -10,7 +10,8 @@
 </head>
 
 <body>
-    {}
+    {% if user.is_authenticated %}
+       {% if user_profile.roles == 'Seller' or user_profile.roles == 'Admin' %}
     <div class="wrapper">
         {% include 'side_nav.html' %}
         <div class="container">
@@ -44,6 +45,8 @@
             </form>
         </div>
     </div>
+       {% endif %}
+    {% endif %}
 </body>
 
 </html>

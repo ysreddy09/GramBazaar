@@ -222,21 +222,40 @@ def side_nav(request):
 
 
 def add_product(request):
-    return render(request, 'add_product.html')
-
+    if 'user' in request.session:
+        username = request.session.get('user')
+        user = User.objects.get(username=username)
+        user_profile = UserProfile.objects.get(user=user)
+    else:
+        return render('login')
+    return render(request, 'add_product.html', {'user': user, 'user_profile': user_profile})
 
 def details(request):
     if 'user' in request.session:
         username = request.session.get('user')
         user = User.objects.get(username=username)
         user_profile = UserProfile.objects.get(user=user)
+        if user_profile.roles in ('Seller', 'Admin'):
+            if request.GET.get('type') == 'buyer':
+                page_type = 'buyer'
+            else:
+                page_type = 'seller'
     else:
         return redirect('login')
-    return render(request, 'details.html', {'user': user, 'user_profile': user_profile})
+    return render(request, 'details.html', {'user': user, 'user_profile': user_profile, 'page_type': page_type})
 
 
 def products_hist(request):
-    return render(request, 'products_hist.html')
+    if 'user' in request.session:
+        username = request.session.get('user')
+        user = User.objects.get(username=username)
+        user_profile = UserProfile.objects.get(user=user)
+        if user_profile.roles in ('Seller', 'Admin'):
+            if request.GET.get('type') == 'ava_products':
+                page_type = 'ava_products'
+            else:
+                page_type = 'pur_products'
+    return render(request, 'products_hist.html', {'user': user, 'user_profile': user_profile, 'page_type': page_type})
 
 
 def update_seller(request):

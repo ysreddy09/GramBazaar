@@ -10,10 +10,16 @@
 </head>
 
 <body>
+    {% if user.is_authenticated %}
+       {% if user_profile.roles == 'Seller' or user_profile.roles == 'Admin' %}
     <div class="wrapper">
         {% include 'side_nav.html' %}
         <div class="container">
-            <h1 class="heading">Available Products</h1> <!-- Added heading -->
+            {% if page_type == 'ava_products' %}
+               <h1 class="heading" style="text-align:center">Available Products</h1>
+            {% elif page_type == 'pur_products' %}
+                <h1 class="heading" style="text-align:center">Purchased Products</h1>
+            {% endif %}
             <table>
                 <thead>
                     <tr>
@@ -26,70 +32,22 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {% for product in products %}
                     <tr>
-                        <td>12345</td>
-                        <td><img src="bhoomi-program-bhoomi-santhe-cover-image.jpg" alt="Product Image"></td>
-                        <td>Product Name 1</td>
-                        <td>Product Description 1</td>
-                        <td>$100.00</td>
-                        <td>Seller Name 1</td>
+                        <td>{{ product.id }}</td>
+                        <td><img src="{{ product.image.url }}" alt="Product Image"></td>
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.description }}</td>
+                        <td>{{ product.price }}</td>
+                        <td>{{ product.seller.name }}</td>
                     </tr>
-                    <!-- Add more rows for additional products -->
-                    <tr>
-                        <td>67890</td>
-                        <td><img src="bhoomi-program-bhoomi-santhe-cover-image.jpg" alt="Product Image"></td>
-                        <td>Product Name 2</td>
-                        <td>Product Description 2</td>
-                        <td>$120.00</td>
-                        <td>Seller Name 2</td>
-                    </tr>
-                       <tr>
-                        <td>67890</td>
-                        <td><img src="bhoomi-program-bhoomi-santhe-cover-image.jpg" alt="Product Image"></td>
-                        <td>Product Name 2</td>
-                        <td>Product Description 2</td>
-                        <td>$120.00</td>
-                        <td>Seller Name 2</td>
-                    </tr>
-                       <tr>
-                        <td>67890</td>
-                        <td><img src="bhoomi-program-bhoomi-santhe-cover-image.jpg" alt="Product Image"></td>
-                        <td>Product Name 2</td>
-                        <td>Product Description 2</td>
-                        <td>$120.00</td>
-                        <td>Seller Name 2</td>
-                    </tr>
-                       <tr>
-                        <td>67890</td>
-                        <td><img src="bhoomi-program-bhoomi-santhe-cover-image.jpg" alt="Product Image"></td>
-                        <td>Product Name 2</td>
-                        <td>Product Description 2</td>
-                        <td>$120.00</td>
-                        <td>Seller Name 2</td>
-                    </tr>
-                       <tr>
-                        <td>67890</td>
-                        <td><img src="bhoomi-program-bhoomi-santhe-cover-image.jpg" alt="Product Image"></td>
-                        <td>Product Name 2</td>
-                        <td>Product Description 2</td>
-                        <td>$120.00</td>
-                        <td>Seller Name 2</td>
-                    </tr>
-                       <tr>
-                        <td>67890</td>
-                        <td><img src="bhoomi-program-bhoomi-santhe-cover-image.jpg" alt="Product Image"></td>
-                        <td>Product Name 2</td>
-                        <td>Product Description 2</td>
-                        <td>$120.00</td>
-                        <td>Seller Name 2</td>
-                    </tr>
-
-
-                    <!-- Add more rows for additional products -->
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
+   {% endif %}
+   {% endif %}
 </body>
 
 </html>

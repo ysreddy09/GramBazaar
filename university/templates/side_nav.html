@@ -44,10 +44,10 @@
                     </a>
                     <ul id="auth" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
                         <li class="sidebar-item">
-                            <a href="{% url 'details' type='Buyer' %}" class="sidebar-link">Buyers</a>
+                            <a href="{% url 'details' %}?type=buyer" class="sidebar-link">Buyers</a>
                         </li>
                         <li class="sidebar-item">
-                            <a href="{% url 'details' type='Seller' %}" class="sidebar-link">Buyers</a>
+                            <a href="{% url 'details' %}?type=seller" class="sidebar-link">Seller</a>
                         </li>
                     </ul>
                 </li>
@@ -59,10 +59,10 @@
                     </a>
                     <ul id="multi" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
                         <li class="sidebar-item">
-                            <a href="{% url 'products_hist' %}" class="sidebar-link">Available Products</a>
+                            <a href="{% url 'products_hist' %}?type=ava_products" class="sidebar-link">Available Products</a>
                         </li>
                         <li class="sidebar-item">
-                            <a href="{% url 'products_hist' %}" class="sidebar-link">Purchased Products</a>
+                            <a href="{% url 'products_hist' %}?type=pur_products" class="sidebar-link">Purchased Products</a>
                         </li>
                     </ul>
                 </li>

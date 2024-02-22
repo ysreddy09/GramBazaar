@@ -13,7 +13,11 @@
             <div class="wrapper">
                 {% include 'side_nav.html' %}
                 <div class="container">
-                    <h1>Buyer Details</h1>
+                    {% if page_type == 'buyer' %}
+                        <h1>Buyer Details</h1>
+                    {% elif page_type == 'seller' %}
+                         <h1>Seller Details</h1>
+                    {% endif %}
                     <div class="black-box">
                         <table>
                             <thead>
