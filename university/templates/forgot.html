@@ -1,12 +1,39 @@
 <!DOCTYPE html>
+{% load static %}
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Forgot Password</title>
+        <link rel="stylesheet" type="text/css" href="{% static 'css/forgot.css' %}">
+
 </head>
 <body>
-    <form>
-        <label for="email" >
-    </form>
+    <div class="signup-container">
+        <form action="{% url 'forgot' %}" method="post">
+          <h2>Forgot Password</h2>
+        {% csrf_token %}
+            {% if form.errors %}
+        <ul>
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <li>{{ field.label }}: {{ error }}</li>
+                {% endfor %}
+            {% endfor %}
+        </ul>
+         {% endif %}
+        <div class="input-container">
+            <label for="email">Enter Email</label>
+            <input id="email" type="email" placeholder="enter email" required />
+        </div>
+        <div class="input-container">
+            <label for="Phone Number">Enter Mobile number </label>
+            <input id="Phone Number" type="text" required />
+        </div>
+        <button >Send OTP</button>
+        </form>
+
+
+    </div>
 </body>
 </html>

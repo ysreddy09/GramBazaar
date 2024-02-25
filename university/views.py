@@ -9,7 +9,7 @@ from django.contrib.auth import authenticate, get_user_model
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from .models import UserProfile
-from .forms import SignUpForm, LoginForm, ProfileUpdateForm
+from .forms import SignUpForm, LoginForm, ProfileUpdateForm, ForgotPasswordForm
 import io
 from django.http import FileResponse
 from reportlab.pdfgen import canvas
@@ -98,6 +98,46 @@ def signup(request):
     else:
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form})
+
+def forgot(request):
+    if request.method == 'POST':
+        form = ForgotPasswordForm(request.POST)
+        print("hello")
+        if form.is_valid():
+            # Process the form data, such as sending an OTP
+            # For demonstration purposes, let's just print the data
+            email = form.cleaned_data.get('email')
+            phone_number = form.cleaned_data.get('phone_number')
+            print(f"Email: {email}, Phone Number: {phone_number}")
+
+
+            # Assuming you have a URL named 'otp_sent'
+            return redirect('login')  # Redirect to a page indicating OTP sent
+
+    else:
+        form = ForgotPasswordForm()
+
+    return render(request, 'forgot.html', {'form': form})
+
+# def forgot(request):
+#     form = ForgotPasswordForm()
+#
+#     if request.method == 'POST':
+#         form = ForgotPasswordForm(request.POST)
+#         print("hello")
+#
+#         if form.is_valid():
+#
+#             username = form.cleaned_data['username']
+#             phone_number = form.cleaned_data['phone_number']
+#
+#             user = authenticate(request, username=username, phone_number=phone_number)
+#
+#             if user is None:
+#                 redirect('home')
+#         else:
+#             print('Bye')
+#     return render(request, 'forgot.html')
 
 
 def login(request):

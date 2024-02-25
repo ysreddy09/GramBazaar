@@ -10,6 +10,11 @@ class SignUpForm(forms.Form):
     confirm_password = forms.CharField(widget=forms.PasswordInput)
 
 
+class ForgotPasswordForm(forms.Form):
+    email = forms.EmailField(label="Enter Email", required=True)
+    phone_number = forms.CharField(label="Enter Mobile number", required=True)
+
+
 class LoginForm(forms.Form):
     username = forms.CharField(max_length=100)
     password = forms.CharField(widget=forms.PasswordInput)
