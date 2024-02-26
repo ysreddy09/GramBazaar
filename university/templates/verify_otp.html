@@ -89,14 +89,10 @@
 
 <body>
     <div class="signup-container">
-
-
-
         <form id="input-otp" action="{% url 'verify_otp' %}" method="post">
-
-            <p>OTP Send to {{email}}  Successfully </p>
-             {% csrf_token %}
-            {% if form.errors %}
+    <p>OTP Send to {{ email }} Successfully </p>
+    {% csrf_token %}
+    {% if form.errors %}
         <ul>
             {% for field in form %}
                 {% for error in field.errors %}
@@ -104,17 +100,17 @@
                 {% endfor %}
             {% endfor %}
         </ul>
-         {% endif %}
-            <h1>Enter OTP</h1>
-            <div class="otp-field">
-                <input type="text" maxlength="1" />
-                <input type="text" maxlength="1" />
-                <input type="text" maxlength="1" />
-                <input type="text" maxlength="1" />
-            </div><br>
-            <button type="submit" onclick="otp_submit()">Verify OTP</button>
-
-        </form>
+    {% endif %}
+    <h1>Enter OTP</h1>
+    <div class="otp-field">
+    <input type="text" maxlength="1" name="digit1" id="id_digit1">
+    <input type="text" maxlength="1" name="digit2" id="id_digit2">
+    <input type="text" maxlength="1" name="digit3" id="id_digit3">
+    <input type="text" maxlength="1" name="digit4" id="id_digit4">
+</div>
+<br>
+    <button type="submit">Verify OTP</button>
+</form>
 
     </div>
 </body>
