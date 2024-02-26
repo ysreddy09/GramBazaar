@@ -3,15 +3,15 @@ from django.contrib import messages
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
-from django.shortcuts import render, redirect, reverse
+from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, get_user_model
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from .models import UserProfile
-from .forms import SignUpForm, LoginForm, ProfileUpdateForm, ForgotPasswordForm
+from .forms import SignUpForm, LoginForm, ProfileUpdateForm, ForgotPasswordForm, OTPForm
 import io
-from django.http import FileResponse
+from django.http import FileResponse, HttpResponse
 from reportlab.pdfgen import canvas
 
 
@@ -43,6 +43,17 @@ def send_verification_email(request, user, verification_link):
 
     return redirect('verification')
 
+def send_otp_mail(request, user,text):
+    current_site = get_current_site(request)
+    subject = 'OTP for forgot password request'
+    message = f'Hello {user.username},\n\n' \
+              f'Do not Share OTP to anyone:\n\n' \
+              f'Your One Time Password is {text}\n\n' \
+              f'Thank you,\n' \
+              f'The Example Team\n\n' \
+              f'This is an automated message, please do not reply.'
+
+    send_mail(subject, message, 'yaswanth2813@gmail.com', [user.email])
 
 def verify_email(request, uidb64, token):
     try:
@@ -99,29 +110,10 @@ def signup(request):
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form})
 
-def forgot(request):
-    if request.method == 'POST':
-        form = ForgotPasswordForm(request.POST)
-        print("hello")
-        if form.is_valid():
-            # Process the form data, such as sending an OTP
-            # For demonstration purposes, let's just print the data
-            email = form.cleaned_data.get('email')
-            phone_number = form.cleaned_data.get('phone_number')
-            print(f"Email: {email}, Phone Number: {phone_number}")
 
-
-            # Assuming you have a URL named 'otp_sent'
-            return redirect('login')  # Redirect to a page indicating OTP sent
-
-    else:
-        form = ForgotPasswordForm()
-
-    return render(request, 'forgot.html', {'form': form})
 
 # def forgot(request):
 #     form = ForgotPasswordForm()
-#
 #     if request.method == 'POST':
 #         form = ForgotPasswordForm(request.POST)
 #         print("hello")
@@ -139,6 +131,43 @@ def forgot(request):
 #             print('Bye')
 #     return render(request, 'forgot.html')
 
+def forgot(request):
+    if request.method == 'POST':
+        form = ForgotPasswordForm(request.POST)
+        if form.is_valid():
+            # Process the form data, such as sending an OTP
+            # For demonstration purposes, let's just print the data
+            email = form.cleaned_data.get('email')
+            user = get_object_or_404(User, email=email)
+
+            if user is None:
+                print("No User")
+            if user is not None:
+                otp = ''.join([str(random.randint(0, 9)) for _ in range(4)])
+                send_otp_mail(request, user, otp)
+                return render(request, 'verify_otp.html', {'email': email})
+
+    else:
+        form = ForgotPasswordForm()
+
+    return render(request, 'forgot.html', {'form': form})
+
+def verify_otp(request):
+    if request.method == 'POST':
+        form = OTPForm(request.POST)
+        if form.is_valid():
+            # Combine digits to form OTP
+            otp = ''.join(form.cleaned_data.values())
+            # Perform OTP verification logic here
+            # For example, compare with the actual OTP stored in session or database
+            # If verification succeeds, redirect to a success page
+            if otp == '1234':  # Example OTP, replace with your verification logic
+                return HttpResponse('OTP verification successful!')
+            else:
+                return HttpResponse('Invalid OTP. Please try again.')
+    else:
+        form = OTPForm()
+    return render(request, 'verify_otp.html', {'form': form})
 
 def login(request):
     form = LoginForm()

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: white;
+        }
+
+        .signup-container {
+            background-color: white;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            width: 350px;
+            padding-right: 30px;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+
+        .input-container {
+            text-align: left;
+            margin-bottom: 10px;
+            /* Reduced margin */
+        }
+
+        label {
+            /* display: block; */
+            margin-bottom: 3px;
+            /* Reduced margin */
+            font-weight: bold;
+        }
+
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+
+        .otp-field {
+            display: unset;
+        }
+
+        .otp-field input {
+            width: 24px;
+            font-size: 32px;
+            padding: 10px;
+            text-align: center;
+            border-radius: 5px;
+            margin: 2px;
+            border: 2px solid #217ae1;
+            background: #45b3d7;
+            font-weight: bold;
+            color: #fff;
+            outline: none;
+            transition: all 0.1s;
+        }
+
+        .otp-field input:focus {
+            border: 2px solid #c89be8;
+            box-shadow: 0 0 2px 2px #8297db6a;
+        }
+
+        .disabled {
+            opacity: 0.5;
+        }
+
+        .space {
+            margin-right: 1rem !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="signup-container">
+
+
+
+        <form id="input-otp" action="{% url 'verify_otp' %}" method="post">
+
+            <p>OTP Send to {{email}}  Successfully </p>
+             {% csrf_token %}
+            {% if form.errors %}
+        <ul>
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <li>{{ field.label }}: {{ error }}</li>
+                {% endfor %}
+            {% endfor %}
+        </ul>
+         {% endif %}
+            <h1>Enter OTP</h1>
+            <div class="otp-field">
+                <input type="text" maxlength="1" />
+                <input type="text" maxlength="1" />
+                <input type="text" maxlength="1" />
+                <input type="text" maxlength="1" />
+            </div><br>
+            <button type="submit" onclick="otp_submit()">Verify OTP</button>
+
+        </form>
+
+    </div>
+</body>
+<script>
+
+    const inputs = document.querySelectorAll(".otp-field input");
+
+    inputs.forEach((input, index) => {
+        input.dataset.index = index;
+        input.addEventListener("keyup", handleOtp);
+        input.addEventListener("paste", handleOnPasteOtp);
+    });
+
+    function handleOtp(e) {
+
+        const input = e.target;
+        let value = input.value;
+        let isValidInput = value.match(/[0-9a-z]/gi);
+        input.value = "";
+        input.value = isValidInput ? value[0] : "";
+
+        let fieldIndex = input.dataset.index;
+        if (fieldIndex < inputs.length - 1 && isValidInput) {
+            input.nextElementSibling.focus();
+        }
+
+        if (e.key === "Backspace" && fieldIndex > 0) {
+            input.previousElementSibling.focus();
+        }
+    }
+
+    function handleOnPasteOtp(e) {
+        const data = e.clipboardData.getData("text");
+        const value = data.split("");
+        if (value.length === inputs.length) {
+            inputs.forEach((input, index) => (input.value = value[index]));
+
+        }
+    }
+    function otp_submit() {
+
+
+        let otp = "";
+        inputs.forEach((input) => {
+            otp += input.value;
+            input.disabled = true;
+            input.classList.add("disabled");
+        });
+        console.log(otp);
+
+        alert("Entered OTP: " + otp);
+    }
+
+</script>
+
+</html>

@@ -26,5 +26,6 @@ urlpatterns = [
     path('verification/', views.verification, name='verification'),
     path('send_verification_email', views.send_verification_email, name='send_verification_email'),
     path('verify_email/<uidb64>/<token>/', verify_email, name='verify_email'),
-    path('forgot/',views.forgot, name='forgot')
+    path('forgot/',views.forgot, name='forgot'),
+    path('verify_otp/', views.verify_otp, name='verify_otp')
 ]
