@@ -4,18 +4,74 @@
 <head>
     <meta charset="UTF-8">
     <title>Gram Bazaar</title>
+    <link rel="stylesheet" href="{% static 'css/products.css' %}">
 </head>
 <body>
   {% if user.is_authenticated %}
       {% if user_profile.roles == 'Customer' %}
-         {% include 'navbar.html' %}
-         {% include 'home_page_slider.html' %}
-         {% include 'products.html' %}
-         {% include 'footer.html' %}
+          {% include 'navbar.html' %}
+          {% include 'home_page_slider.html' %}
+          <h1 class="page-title">Products</h1>
+          <div class="container">
+                {% for product in products %}
+                    <div class="row-1">
+                        <div class="col-1">
+                            <div class="product-card">
+                                <img src="{{ product.product_image.url }}" alt="Product Image" class="product-image">
+                                <div class="product-details">
+                                    <h2 class="product-name">{{ product.product_name }}</h2>
+                                    <p class="product-price">${{ product.product_price }}</p>
+                                    <p class="product-description">{{ product.product_description }}</p>
+                                    <div class="product-rating" id="rating{{ forloop.counter }}">
+                                        <!-- Stars will be dynamically generated here -->
+                                    </div>
+                                    <span class="rating-value" style="display: none;">{{ product.product_rating }}</span>
+                                    <button class="add-to-cart-button">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+          {% include 'footer.html' %}
       {% endif %}
       {% if user_profile.roles == 'Seller' or user_profile.roles == 'Admin' %}
          {% include 'side_nav.html' %}
       {% endif %}
   {% endif %}
+
+  <script>
+    const Description = document.querySelectorAll('.product-description');
+    Description.forEach(function (div) {
+        const text = div.innerText;
+        if (text.length > 50) {
+            div.innerText = text.substring(0, 50) + '...';
+        }
+    });
+    const ProductName = document.querySelectorAll('.product-name');
+    ProductName.forEach(function (div) {
+        const text = div.innerText;
+        if (text.length > 30) {
+            div.innerText = text.substring(0, 30) + '...';
+        }
+    });
+    const RatingValues = document.querySelectorAll('.rating-value');
+    RatingValues.forEach(function(span) {
+        const ratingValue = parseFloat(span.innerText);
+        const roundedRating = Math.round(ratingValue);
+        const productRating = document.getElementById('rating' + span.dataset.index);
+
+        for (let i = 0; i < 5; i++) {
+            const star = document.createElement('span');
+            star.classList.add('star');
+            if (i < roundedRating) {
+                star.innerHTML = '&#9733;'; // Filled star
+            } else {
+                star.innerHTML = '&#9734;'; // Empty star
+            }
+            productRating.appendChild(star);
+        }
+    });
+</script>
 </body>
 </html>

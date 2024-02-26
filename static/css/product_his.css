@@ -2,15 +2,13 @@ table {
     width: 100%;
     border-collapse: collapse;
 }
-th{
-text-align: -webkit-center;
-}
+
 th,
 td {
     padding: 12px;
-    text-align: -webkit-center;
+    text-align: center;
     border-bottom: 2.5px solid #d9d6d6;
-    color: white;
+    color: white; /* Make text color white */
 }
 
 th {
@@ -34,6 +32,6 @@ tr {
 
 /* Added styles for the heading */
 .heading {
-    text-align: -center;
+    text-align: center;
     margin-top: 20px; /* Adjust margin-top as needed */
 }

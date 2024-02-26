@@ -1,4 +1,7 @@
 from django.urls import path
+
+from django.conf import settings
+from django.conf.urls.static import static
 from . import views
 from .views import verify_email
 
@@ -10,7 +13,6 @@ urlpatterns = [
     path('logout/', views.logout, name='logout'),
     path('navbar/', views.navbar, name='navbar'),
     path('home_page_slider/', views.home_page_slider, name='home_page_slider'),
-    path('products/', views.navbar, name='products'),
     path('add_to_cart/', views.add_to_cart, name='add_to_cart'),
     path('profile/', views.profile, name='profile'),
     path('footer/', views.footer, name='footer'),
@@ -27,3 +29,6 @@ urlpatterns = [
     path('send_verification_email', views.send_verification_email, name='send_verification_email'),
     path('verify_email/<uidb64>/<token>/', verify_email, name='verify_email'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

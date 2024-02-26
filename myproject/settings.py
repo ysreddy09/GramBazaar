@@ -137,3 +137,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'yaswanth2813@gmail.com'
 EMAIL_HOST_PASSWORD = 'vnpehrowoqltsfya'
 EMAIL_PORT = 587
+
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Where the uploads will be stored
+MEDIA_URL = '/media/'

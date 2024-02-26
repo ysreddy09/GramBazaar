@@ -1,16 +1,15 @@
-import random
+import random, io
 from django.contrib import messages
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
 from django.shortcuts import render, redirect, reverse
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth import authenticate, get_user_model, logout
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from .models import UserProfile
+from .models import UserProfile, Product
 from .forms import SignUpForm, LoginForm, ProfileUpdateForm
-import io
 from django.http import FileResponse
 from reportlab.pdfgen import canvas
 
@@ -132,9 +131,10 @@ def home(request):
         username = request.session.get('user')
         user = User.objects.get(username=username)
         user_profile = UserProfile.objects.get(user=user)
+        products = Product.objects.all()
     else:
         redirect('login')
-    return render(request, 'home.html', {'user': user, 'user_profile': user_profile})
+    return render(request, 'home.html', {'user': user, 'user_profile': user_profile, 'products': products})
 
 
 def navbar(request):
@@ -145,10 +145,6 @@ def home_page_slider(request):
     return render(request, 'home_page_slider.html')
 
 
-def products(request):
-    return render(request, 'products.html')
-
-
 def add_to_cart(request):
     if 'user' in request.session:
         username = request.session.get('user')
@@ -157,18 +153,6 @@ def add_to_cart(request):
     else:
         return redirect('login')
     return render(request, 'add_to_cart.html', {'user': user, 'user_profile': user_profile})
-
-
-def profile(request):
-    if 'user' in request.session:
-        User = get_user_model()
-        username = request.session.get('user')
-        user = User.objects.get(username=username)
-        user_profile = UserProfile.objects.get(user=user)
-        print(user_profile.profile_pic)
-    else:
-        return redirect('login')
-    return render(request, 'profile.html', {'user_profile': user_profile, 'user': user})
 
 
 def footer(request):
@@ -188,8 +172,17 @@ def update(request):
                 user_profile.postal_code = form.cleaned_data['postal_code']
                 user_profile.phone_number = form.cleaned_data['phone_number']
                 user_profile.address = form.cleaned_data['address']
+                # Check if a new profile picture was uploaded
                 if 'profile_pic' in request.FILES:
+                    # If a new image is uploaded, delete the existing one
+                    if user_profile.profile_pic:
+                        user_profile.profile_pic.delete(save=False)
                     user_profile.profile_pic = request.FILES['profile_pic']
+
+                if request.POST.get('remove_photo', False):
+                    # If requested, delete the existing photo
+                    if user_profile.profile_pic:
+                        user_profile.profile_pic.delete(save=False)
                 user.save()
                 user_profile.save()
                 return redirect('profile')
@@ -226,9 +219,27 @@ def add_product(request):
         username = request.session.get('user')
         user = User.objects.get(username=username)
         user_profile = UserProfile.objects.get(user=user)
+        if request.method == 'POST':
+            product_id = request.POST['product_id']
+            product_name = request.POST['product_name']
+            product_description = request.POST['product_description']
+            product_price = request.POST['product_price']
+            product_rating = request.POST['product_rating']
+            product_image = request.FILES['product_image']
+            product = Product.objects.create(
+                user=user,
+                product_id=product_id,
+                product_name=product_name,
+                product_description=product_description,
+                product_price=product_price,
+                product_rating=product_rating,
+                product_image=product_image
+            )
+            print(product)
     else:
-        return render('login')
+        return redirect('login')
     return render(request, 'add_product.html', {'user': user, 'user_profile': user_profile})
+
 
 def details(request):
     if 'user' in request.session:
@@ -250,12 +261,14 @@ def products_hist(request):
         username = request.session.get('user')
         user = User.objects.get(username=username)
         user_profile = UserProfile.objects.get(user=user)
+        products = Product.objects.all()
         if user_profile.roles in ('Seller', 'Admin'):
             if request.GET.get('type') == 'ava_products':
                 page_type = 'ava_products'
             else:
                 page_type = 'pur_products'
-    return render(request, 'products_hist.html', {'user': user, 'user_profile': user_profile, 'page_type': page_type})
+        return render(request, 'products_hist.html',
+                      {'user': user, 'user_profile': user_profile, 'page_type': page_type, 'products': products})
 
 
 def update_seller(request):
@@ -281,9 +294,7 @@ def verification(request):
 def generate_pdf(request):
     # Create a file-like buffer to receive PDF data.
     buffer = io.BytesIO()
-
     p = canvas.Canvas(buffer)
-
     # Draw content on the PDF.
     p.drawString(100, 750, "Shopping Cart")
     p.drawString(100, 700, "Image")
@@ -321,3 +332,15 @@ def generate_pdf(request):
 
     # Return the PDF as a FileResponse.
     return FileResponse(buffer, as_attachment=True, filename="shopping_cart.pdf")
+
+
+def profile(request):
+    if 'user' in request.session:
+        User = get_user_model()
+        username = request.session.get('user')
+        user = User.objects.get(username=username)
+        user_profile = UserProfile.objects.get(user=user)
+    else:
+        return redirect('login')
+    return render(request, 'profile.html', {'user_profile': user_profile, 'user': user})
+

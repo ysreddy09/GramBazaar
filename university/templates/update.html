@@ -19,15 +19,15 @@
                 <div class="profile-details">
                     <div class="profile-image-container">
                         <div class="profile-image" id="profileImage">
-                            {% if user_profile.profile_picture.value %}
-                                <img src="{{ form.profile_picture.value.url }}">
+                            {% if user_profile.profile_pic %}
+                                <img src="{{ user_profile.profile_pic.url }}" alt="Profile Picture" id="profileImg">
                             {% else %}
-                                <img src="path/to/default_image.jpg">
+                                <img src="{% static 'images/default_profile_pic.jpg' %}" alt="Default Profile Picture" id="profileImg">
                             {% endif %}
                             <div class="overlay" id="overlay">
                                 <label for="changePhoto" class="change-photo">Change Photo</label>
-                                <input type="file" id="changePhoto" name="profile_picture" style="display: none;">
-                                <button class="remove-photo" id="removePhoto">Remove Photo</button>
+                                <input type="file" id="changePhoto" name="profile_pic" style="display: none;">
+                                <button type="button" class="remove-photo" id="removePhoto">Remove Photo</button>
                             </div>
                         </div>
                     </div>
@@ -47,13 +47,15 @@
                     <div class="form-group">
                         <label for="phoneNumber">Phone Number:</label>
                         <input type="text" id="phoneNumber" name="phone_number"
-                               placeholder="Enter Phone Number (10 digits with 91 country code)" pattern="^91\d{10}$"
-                               title="Please enter 10 digits with 91 country code"  value="{{ user_profile.phone_number }}" required>
+                               placeholder="Enter Phone Number (10 digits)" pattern="\d{10}"
+                               title="Please enter 10 digits without any country code"  value="{{ user_profile.phone_number }}" required>
                     </div>
                     <div class="form-group">
                         <label for="address">Address:</label>
                         <textarea id="address" name="address" placeholder="Enter Address" required>{{ user_profile.address }}</textarea>
                     </div>
+                    <!-- Add form field to remove photo -->
+                    <input type="hidden" name="remove_photo" id="removePhotoField">
                     <button type="submit" class="update-btn">Update</button>
                 </div>
             </div>

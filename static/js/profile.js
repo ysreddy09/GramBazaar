@@ -1,17 +1,32 @@
-document.getElementById('changePhoto').addEventListener('change', function (event) {
-      const file = event.target.files[0];
-      const reader = new FileReader();
+document.addEventListener('DOMContentLoaded', function () {
+    // ... (your existing code for image preview)
 
-      reader.onload = function (e) {
-        const profileImg = document.getElementById('profileImage');
-        profileImg.querySelector('img').src = e.target.result;
-      };
+    const form = document.querySelector('.personal-info-form');
+    const removePhotoBtn = document.getElementById('removePhoto');
+    const removePhotoField = document.getElementById('removePhotoField');
 
-      reader.readAsDataURL(file);
+    // Remove photo
+    removePhotoBtn.addEventListener('click', function () {
+        // ... (your code)
+        removePhotoField.value = 'true'; // Set hidden field to signal removal
     });
 
-    document.getElementById('removePhoto').addEventListener('click', function () {
-      const defaultImageSrc = 'path/to/default_image.jpg';
-      const profileImg = document.getElementById('profileImage');
-      profileImg.querySelector('img').src = defaultImageSrc;
+    // Submit the form on update with validation
+    form.addEventListener('submit', function(event) {
+        if (!validateForm()) { // Call a validation function
+            event.preventDefault(); // Prevent submission if validation fails
+        }
     });
+
+    function validateForm() {
+        // Add your client-side validation logic here for postal code, phone number, etc.
+        // Example:
+        const postalCodeInput = document.getElementById('postalCode');
+        if (!postalCodeInput.checkValidity()) {
+           alert('Please enter a valid postal code.');
+           return false;
+        }
+        // ... add more validation checks
+        return true; // Indicate successful validation
+    }
+});

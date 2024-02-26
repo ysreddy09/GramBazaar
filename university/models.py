@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -20,6 +21,8 @@ class Product(models.Model):
     product_name = models.CharField(max_length=255)
     product_description = models.TextField()
     product_price = models.DecimalField(max_digits=10, decimal_places=2)
+    product_rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.0,
+                                         validators=[MinValueValidator(0.0), MaxValueValidator(5.0)])
 
 
 class PurchaseHistory(models.Model):

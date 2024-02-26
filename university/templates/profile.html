@@ -16,8 +16,9 @@
         <div class="profile-container">
             <div class="profile-details">
                 <div class="profile-image-container">
-                    <div class="profile-image" id="profileImage">
-                    </div>
+                    {% if user.userprofile.profile_pic %}
+                         <img src="{{ user.userprofile.profile_pic.url }}" alt="Profile Picture" class="profile-image">
+                    {% endif %}
                 </div>
                 <div class="personal-info">
                     <h2>Customer Details</h2>

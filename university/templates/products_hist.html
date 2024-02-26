@@ -34,12 +34,12 @@
                 <tbody>
                     {% for product in products %}
                     <tr>
-                        <td>{{ product.id }}</td>
-                        <td><img src="{{ product.image.url }}" alt="Product Image"></td>
-                        <td>{{ product.name }}</td>
-                        <td>{{ product.description }}</td>
-                        <td>{{ product.price }}</td>
-                        <td>{{ product.seller.name }}</td>
+                        <td>{{ product.product_id }}</td>
+                        <td><img src="{{ product.product_image.url }}" alt="Product Image"></td>
+                        <td>{{ product.product_name }}</td>
+                        <td>{{ product.product_description }}</td>
+                        <td>{{ product.product_price }}</td>
+                        <td>{{ product.user.username }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
