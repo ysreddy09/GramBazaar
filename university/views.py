@@ -163,6 +163,7 @@ def verify_otp(request):
             digit2 = form.cleaned_data['digit2']
             digit3 = form.cleaned_data['digit3']
             digit4 = form.cleaned_data['digit4']
+
             # Combine digits to form OTP
             otp = digit1 + digit2 + digit3 + digit4
             session_otp = request.session.get('otp')
