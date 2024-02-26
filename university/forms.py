@@ -10,6 +10,17 @@ class SignUpForm(forms.Form):
     confirm_password = forms.CharField(widget=forms.PasswordInput)
 
 
+
+class ForgotPasswordForm(forms.Form):
+    email = forms.EmailField(label="email", required=True)
+    # phone_number = forms.CharField(label="phone_number", required=True)
+
+class OTPForm(forms.Form):
+    digit1 = forms.CharField(max_length=1, widget=forms.TextInput(attrs={'maxlength': '1', 'class': 'otp-input'}))
+    digit2 = forms.CharField(max_length=1, widget=forms.TextInput(attrs={'maxlength': '1', 'class': 'otp-input'}))
+    digit3 = forms.CharField(max_length=1, widget=forms.TextInput(attrs={'maxlength': '1', 'class': 'otp-input'}))
+    digit4 = forms.CharField(max_length=1, widget=forms.TextInput(attrs={'maxlength': '1', 'class': 'otp-input'}))
+
 class LoginForm(forms.Form):
     username = forms.CharField(max_length=100)
     password = forms.CharField(widget=forms.PasswordInput)
