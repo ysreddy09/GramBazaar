@@ -144,6 +144,7 @@ def forgot(request):
                 print("No User")
             if user is not None:
                 otp = ''.join([str(random.randint(0, 9)) for _ in range(4)])
+                request.session['otp'] = otp
                 send_otp_mail(request, user, otp)
                 return render(request, 'verify_otp.html', {'email': email})
 
@@ -152,19 +153,29 @@ def forgot(request):
 
     return render(request, 'forgot.html', {'form': form})
 
+
 def verify_otp(request):
     if request.method == 'POST':
         form = OTPForm(request.POST)
         if form.is_valid():
+            # Get cleaned data for each digit
+            digit1 = form.cleaned_data['digit1']
+            digit2 = form.cleaned_data['digit2']
+            digit3 = form.cleaned_data['digit3']
+            digit4 = form.cleaned_data['digit4']
             # Combine digits to form OTP
-            otp = ''.join(form.cleaned_data.values())
-            # Perform OTP verification logic here
-            # For example, compare with the actual OTP stored in session or database
-            # If verification succeeds, redirect to a success page
-            if otp == '1234':  # Example OTP, replace with your verification logic
+            otp = digit1 + digit2 + digit3 + digit4
+            session_otp = request.session.get('otp')
+            print(session_otp)
+            if otp == session_otp:
+                del request.session['otp']
                 return HttpResponse('OTP verification successful!')
             else:
                 return HttpResponse('Invalid OTP. Please try again.')
+
+        else:
+            # If the form is not valid, re-render the form with errors
+            return render(request, 'verify_otp.html', {'form': form})
     else:
         form = OTPForm()
     return render(request, 'verify_otp.html', {'form': form})
