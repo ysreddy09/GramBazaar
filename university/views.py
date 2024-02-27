@@ -9,7 +9,7 @@ from django.contrib.auth import authenticate, get_user_model
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from .models import UserProfile
-from .forms import SignUpForm, LoginForm, ProfileUpdateForm, ForgotPasswordForm, OTPForm
+from .forms import SignUpForm, LoginForm, ProfileUpdateForm, ForgotPasswordForm, OTPForm, ResetPasswordForm
 import io
 from django.http import FileResponse, HttpResponse
 from reportlab.pdfgen import canvas
@@ -111,25 +111,29 @@ def signup(request):
     return render(request, 'signup.html', {'form': form})
 
 
+def reset_password(request):
+    if request.method=='POST':
+        form=ResetPasswordForm()
+        if(form.is_valid()):
+            password = form.cleaned_data['password']
+            confirm_password = form.cleaned_data['confirm_password']
+            session_email = request.session.get('email')
 
-# def forgot(request):
-#     form = ForgotPasswordForm()
-#     if request.method == 'POST':
-#         form = ForgotPasswordForm(request.POST)
-#         print("hello")
-#
-#         if form.is_valid():
-#
-#             username = form.cleaned_data['username']
-#             phone_number = form.cleaned_data['phone_number']
-#
-#             user = authenticate(request, username=username, phone_number=phone_number)
-#
-#             if user is None:
-#                 redirect('home')
-#         else:
-#             print('Bye')
-#     return render(request, 'forgot.html')
+
+
+            if(password == confirm_password):
+                print("Same")
+                print(session_email)
+            else:
+                print("Not same")
+
+        print("form not valid")
+    print("method is not post")
+    return render(request,'login.html')
+
+
+
+
 
 def forgot(request):
     if request.method == 'POST':
@@ -139,10 +143,10 @@ def forgot(request):
             # For demonstration purposes, let's just print the data
             email = form.cleaned_data.get('email')
             user = get_object_or_404(User, email=email)
-
             if user is None:
                 print("No User")
             if user is not None:
+                request.session['email'] = email
                 otp = ''.join([str(random.randint(0, 9)) for _ in range(4)])
                 request.session['otp'] = otp
                 send_otp_mail(request, user, otp)
@@ -170,7 +174,7 @@ def verify_otp(request):
             print(session_otp)
             if otp == session_otp:
                 del request.session['otp']
-                return HttpResponse('OTP verification successful!')
+                return render(request, 'reset_password.html')
             else:
                 return HttpResponse('Invalid OTP. Please try again.')
 
