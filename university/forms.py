@@ -14,7 +14,9 @@ class ForgotPasswordForm(forms.Form):
     email = forms.EmailField(label="email", required=True)
     # phone_number = forms.CharField(label="phone_number", required=True)
 
-
+class ResetPasswordForm(forms.Form):
+    password = forms.CharField(label="Password", widget=forms.PasswordInput)
+    confirm_password = forms.CharField(label="Confirm Password", widget=forms.PasswordInput)
 class OTPForm(forms.Form):
     digit1 = forms.CharField(max_length=1,label="digit1")
     digit2 = forms.CharField(max_length=1,label="digit2")
