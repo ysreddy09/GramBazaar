@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, get_user_model
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from .models import UserProfile
+from .models import UserProfile, Product
 from .forms import SignUpForm, LoginForm, ProfileUpdateForm, ForgotPasswordForm, OTPForm
 import io
 from django.http import FileResponse, HttpResponse
@@ -43,7 +43,8 @@ def send_verification_email(request, user, verification_link):
 
     return redirect('verification')
 
-def send_otp_mail(request, user,text):
+
+def send_otp_mail(request, user, text):
     current_site = get_current_site(request)
     subject = 'OTP for forgot password request'
     message = f'Hello {user.username},\n\n' \
@@ -54,6 +55,7 @@ def send_otp_mail(request, user,text):
               f'This is an automated message, please do not reply.'
 
     send_mail(subject, message, 'yaswanth2813@gmail.com', [user.email])
+
 
 def verify_email(request, uidb64, token):
     try:
@@ -109,7 +111,6 @@ def signup(request):
     else:
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form})
-
 
 
 # def forgot(request):
@@ -181,6 +182,7 @@ def verify_otp(request):
         form = OTPForm()
     return render(request, 'verify_otp.html', {'form': form})
 
+
 def login(request):
     form = LoginForm()
     if request.method == 'POST':
@@ -213,9 +215,10 @@ def home(request):
         username = request.session.get('user')
         user = User.objects.get(username=username)
         user_profile = UserProfile.objects.get(user=user)
+        products = Product.objects.all()
     else:
         redirect('login')
-    return render(request, 'home.html', {'user': user, 'user_profile': user_profile})
+    return render(request, 'home.html', {'user': user, 'user_profile': user_profile, 'products': products})
 
 
 def navbar(request):
