@@ -306,6 +306,31 @@ def side_nav(request):
 
 
 def add_product(request):
+    if 'user' in request.session:
+        username = request.session.get('user')
+        user = User.objects.get(username=username)
+        user_profile = UserProfile.objects.get(user=user)
+        if request.method == 'POST':
+            product_id = request.POST['product_id']
+            product_name = request.POST['product_name']
+            product_description = request.POST['product_description']
+            product_price = request.POST['product_price']
+            product_rating = request.POST['product_rating']
+            product_image = request.FILES['product_image']
+
+            product = Product.objects.create(
+                user=user,
+                product_id=product_id,
+                product_name=product_name,
+                product_description=product_description,
+                product_price=product_price,
+                product_rating=product_rating,
+                product_image=product_image
+            )
+            print(product)
+    else:
+        return redirect('login')
+    return render(request, 'add_product.html', {'user': user, 'user_profile': user_profile})
     return render(request, 'add_product.html')
 
 
@@ -320,6 +345,18 @@ def details(request):
 
 
 def products_hist(request):
+    if 'user' in request.session:
+        username = request.session.get('user')
+        user = User.objects.get(username=username)
+        user_profile = UserProfile.objects.get(user=user)
+        products = Product.objects.all()
+        if user_profile.roles in ('Seller', 'Admin'):
+            if request.GET.get('type') == 'ava_products':
+                page_type = 'ava_products'
+            else:
+                page_type = 'pur_products'
+        return render(request, 'products_hist.html',
+                      {'user': user, 'user_profile': user_profile, 'page_type': page_type, 'products': products})
     return render(request, 'products_hist.html')
 
 
