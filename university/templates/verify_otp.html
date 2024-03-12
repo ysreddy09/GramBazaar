@@ -89,7 +89,7 @@
 
 <body>
     <div class="signup-container">
-        <form id="input-otp" action="{% url 'verify_otp' %}" method="post">
+        <form id="input-otp" action="{% url 'verify_otp'  %}" method="post">
     <p>OTP Send to {{ email }} Successfully </p>
     {% csrf_token %}
     {% if form.errors %}

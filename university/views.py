@@ -5,11 +5,11 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth import authenticate, get_user_model, update_session_auth_hash
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from .models import UserProfile, Product
-from .forms import SignUpForm, LoginForm, ProfileUpdateForm, ForgotPasswordForm, OTPForm
+from .forms import SignUpForm, LoginForm, ProfileUpdateForm, ForgotPasswordForm, OTPForm, ResetPasswordForm
 import io
 from django.http import FileResponse, HttpResponse
 from reportlab.pdfgen import canvas
@@ -112,26 +112,7 @@ def signup(request):
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form})
 
-
-# def forgot(request):
-#     form = ForgotPasswordForm()
-#     if request.method == 'POST':
-#         form = ForgotPasswordForm(request.POST)
-#         print("hello")
-#
-#         if form.is_valid():
-#
-#             username = form.cleaned_data['username']
-#             phone_number = form.cleaned_data['phone_number']
-#
-#             user = authenticate(request, username=username, phone_number=phone_number)
-#
-#             if user is None:
-#                 redirect('home')
-#         else:
-#             print('Bye')
-#     return render(request, 'forgot.html')
-
+session_email=None
 def forgot(request):
     if request.method == 'POST':
         form = ForgotPasswordForm(request.POST)
@@ -140,7 +121,8 @@ def forgot(request):
             # For demonstration purposes, let's just print the data
             email = form.cleaned_data.get('email')
             user = get_object_or_404(User, email=email)
-
+            request.session['email'] = email
+            # session_user = request.session.get('user')
             if user is None:
                 print("No User")
             if user is not None:
@@ -156,6 +138,8 @@ def forgot(request):
 
 
 def verify_otp(request):
+    email = request.session.get('email', None)
+    print(email)
     if request.method == 'POST':
         form = OTPForm(request.POST)
         if form.is_valid():
@@ -171,7 +155,8 @@ def verify_otp(request):
             print(session_otp)
             if otp == session_otp:
                 del request.session['otp']
-                return HttpResponse('OTP verification successful!')
+
+                return render(request, 'reset_password.html',{'email':email})
             else:
                 return HttpResponse('Invalid OTP. Please try again.')
 
@@ -181,6 +166,35 @@ def verify_otp(request):
     else:
         form = OTPForm()
     return render(request, 'verify_otp.html', {'form': form})
+
+
+def reset_password(request):
+    email = request.session.get('email', None)
+    print(email)
+    if request.method == 'POST':
+        form = ResetPasswordForm(request.POST)
+        if form.is_valid():
+            new_password = form.cleaned_data['password']
+            confirm_password = form.cleaned_data['confirm_password']
+            user = User.objects.get(email=email)
+            # print(email)
+            # Update the user's password
+            user.set_password(new_password)
+            user.save()
+            # Update the user's password
+
+            # Keep the user logged in after changing password
+            update_session_auth_hash(request, user)
+
+            # Optionally, you can add a success message
+            messages.success(request, 'Your password has been successfully reset.')
+
+            # Redirect the user to a success page or any desired page
+            return HttpResponse('Password reset success_page')  # Replace 'success_page' with your URL name
+    else:
+        form = ResetPasswordForm()
+
+    return render(request, 'reset_password.html', {'form': form})
 
 
 def login(request):

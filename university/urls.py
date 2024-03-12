@@ -30,7 +30,7 @@ urlpatterns = [
     path('verify_email/<uidb64>/<token>/', verify_email, name='verify_email'),
     path('forgot/',views.forgot, name='forgot'),
     path('verify_otp/', views.verify_otp, name='verify_otp'),
-    # path('reset_password/', views.reset_password, name='reset_password')
+    path('reset_password/', views.reset_password, name='reset_password')
 ]
 
 if settings.DEBUG:
