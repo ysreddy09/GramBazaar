@@ -67,6 +67,17 @@
             productRow.slideUp(fadeTime, function () {
                 productRow.remove();
                 recalculateCart();
+                $.ajax({
+            url: '/add_to_cart/',  // Replace this with your Django view URL
+            method: 'POST',
+            data: {'product_id': productId},  // Send product ID to identify the item to delete
+            success: function (response) {
+                // Handle success response if needed
+            },
+            error: function (xhr, status, error) {
+                // Handle error response if needed
+            }
+            });
             });
         }
 

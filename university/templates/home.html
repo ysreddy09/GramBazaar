@@ -3,36 +3,44 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Gram Baza</title>
+    <title>Gram Bazaar</title>
     <link rel="stylesheet" href="{% static 'css/products.css' %}">
 </head>
 <body>
-  {% if user.is_authenticated %}
+   {% if user.is_authenticated %}
       {% if user_profile.roles == 'Customer' %}
           {% include 'navbar.html' %}
           {% include 'home_page_slider.html' %}
           <h1 class="page-title">Products</h1>
-          <div class="container">
-                {% for product in products %}
-                    <div class="row-1">
-                        <div class="col-1">
-                            <div class="product-card">
-                                <img src="{{ product.product_image.url }}" alt="Product Image" class="product-image">
-                                <div class="product-details">
-                                    <h2 class="product-name">{{ product.product_name }}</h2>
-                                    <p class="product-price">${{ product.product_price }}</p>
-                                    <p class="product-description">{{ product.product_description }}</p>
-                                    <div class="product-rating" id="rating{{ forloop.counter }}">
-                                        <!-- Stars will be dynamically generated here -->
-                                    </div>
-                                    <span class="rating-value" style="display: none;">{{ product.product_rating }}</span>
-                                    <button class="add-to-cart-button">Add to Cart</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+
+          {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
                 {% endfor %}
-            </div>
+            </ul>
+          {% endif %}
+
+          <div class="container">
+             {% for product in products %}
+                <div class="product-card">
+                    <img src="{{ product.product_image.url }}" alt="Product Image" class="product-image">
+                    <div class="product-details">
+                        <h2 class="product-name">{{ product.product_name }}</h2>
+                        <p class="product-price">${{ product.product_price }}</p>
+                        <p class="product-description">{{ product.product_description }}</p>
+                        <div class="product-rating" id="rating{{ forloop.counter }}">
+                            </div>
+                        <span class="rating-value" style="display: none;">{{ product.product_rating }}</span>
+                        <form method="POST" action="{% url 'home' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_id" value="{{ product.product_id }}">
+                            <button type="submit" class="add-to-cart-button">Add to Cart</button>
+                        </form>
+                    </div>
+                </div>
+             {% endfor %}
+          </div>
           {% include 'footer.html' %}
       {% endif %}
       {% if user_profile.roles == 'Seller' or user_profile.roles == 'Admin' %}
@@ -72,6 +80,20 @@
             productRating.appendChild(star);
         }
     });
-</script>
+  </script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+

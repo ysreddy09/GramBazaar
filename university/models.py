@@ -23,6 +23,7 @@ class Product(models.Model):
     product_price = models.DecimalField(max_digits=10, decimal_places=2)
     product_rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.0,
                                          validators=[MinValueValidator(0.0), MaxValueValidator(5.0)])
+    seller_name = models.CharField(max_length=255, blank=True)  # Added seller_name field
 
 
 class PurchaseHistory(models.Model):
@@ -31,3 +32,4 @@ class PurchaseHistory(models.Model):
     purchased_datetime = models.DateTimeField(auto_now_add=True)
     seller_name = models.CharField(max_length=255)
     customer_name = models.CharField(max_length=255)
+    quantity = models.IntegerField(default=1)

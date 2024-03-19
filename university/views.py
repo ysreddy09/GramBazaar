@@ -8,10 +8,10 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, get_user_model, update_session_auth_hash
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from .models import UserProfile, Product
+from .models import UserProfile, Product, PurchaseHistory
 from .forms import SignUpForm, LoginForm, ProfileUpdateForm, ForgotPasswordForm, OTPForm, ResetPasswordForm
 import io
-from django.http import FileResponse, HttpResponse
+from django.http import FileResponse, HttpResponse, JsonResponse
 from reportlab.pdfgen import canvas
 
 
@@ -38,10 +38,30 @@ def send_verification_email(request, user, verification_link):
     send_mail(subject, message, 'yaswanth2813@gmail.com', [user.email])
 
     # Set session variables if needed
-    request.session['user_id'] = user.id
+    request.session['user'] = user.username
+    print(user)
     request.session['verification_link'] = verification_link
+    print(verification_link)
+    return redirect('resend')
 
-    return redirect('verification')
+
+def resend(request):
+    if request.method == 'POST':
+        username = request.session.get('user')
+        print(username)
+        verification_link = request.session.get('verification_link')
+        if username and verification_link:
+            try:
+                print('hello')
+                user = User.objects.get(username=username)
+                print(verification_link)
+                send_verification_email(request, user, verification_link)
+                return HttpResponse("Email Resent Successfully")
+            except User.DoesNotExist:
+                return HttpResponse("User does not exist.")
+        else:
+            return HttpResponse("Failed to resend Email")
+    return render(request, 'resend.html')
 
 
 def send_otp_mail(request, user, text):
@@ -107,12 +127,15 @@ def signup(request):
             domain = get_current_site(request).domain
             verification_link = f'http://{domain}{reverse("verify_email", kwargs={"uidb64": uidb64, "token": token})}'
             send_verification_email(request, user, verification_link)
-            return redirect('verification')
+            return redirect('resend')
     else:
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form})
 
-session_email=None
+
+session_email = None
+
+
 def forgot(request):
     if request.method == 'POST':
         form = ForgotPasswordForm(request.POST)
@@ -156,7 +179,7 @@ def verify_otp(request):
             if otp == session_otp:
                 del request.session['otp']
 
-                return render(request, 'reset_password.html',{'email':email})
+                return render(request, 'reset_password.html', {'email': email})
             else:
                 return HttpResponse('Invalid OTP. Please try again.')
 
@@ -169,6 +192,7 @@ def verify_otp(request):
 
 
 def reset_password(request):
+    form = ResetPasswordForm()
     email = request.session.get('email', None)
     print(email)
     if request.method == 'POST':
@@ -179,8 +203,11 @@ def reset_password(request):
             user = User.objects.get(email=email)
             # print(email)
             # Update the user's password
-            user.set_password(new_password)
-            user.save()
+            if new_password == confirm_password:
+                user.set_password(new_password)
+                user.save()
+            else:
+                return render(request, 'reset_password.html', {'form': form})
             # Update the user's password
 
             # Keep the user logged in after changing password
@@ -190,10 +217,7 @@ def reset_password(request):
             messages.success(request, 'Your password has been successfully reset.')
 
             # Redirect the user to a success page or any desired page
-            return HttpResponse('Password reset success_page')  # Replace 'success_page' with your URL name
-    else:
-        form = ResetPasswordForm()
-
+            return redirect('login')  # Replace 'success_page' with your URL name
     return render(request, 'reset_password.html', {'form': form})
 
 
@@ -225,14 +249,38 @@ def login(request):
 
 
 def home(request):
-    if 'user' in request.session:
+    if 'user' in request.session and request.method == 'POST':
+        username = request.session.get('user')
+        user = User.objects.get(username=username)
+        user_profile = UserProfile.objects.get(user=user)
+
+        if user.is_authenticated:
+            product_id = request.POST.get('product_id')
+            print(product_id)
+
+            product = Product.objects.get(product_id=product_id)
+            print(product.product_id)
+            seller_name = product.seller_name
+            customer_name = user.first_name
+            purchase_history = PurchaseHistory.objects.create(
+                user=user,
+                product=product,
+                seller_name=seller_name,
+                customer_name=customer_name
+            )
+
+            messages.success(request, 'Product added to cart!')
+            return redirect('home')
+        else:
+            return redirect('login')
+    elif 'user' in request.session:
         username = request.session.get('user')
         user = User.objects.get(username=username)
         user_profile = UserProfile.objects.get(user=user)
         products = Product.objects.all()
+        return render(request, 'home.html', {'user': user, 'user_profile': user_profile, 'products': products})
     else:
-        redirect('login')
-    return render(request, 'home.html', {'user': user, 'user_profile': user_profile, 'products': products})
+        return redirect('login')
 
 
 def navbar(request):
@@ -247,14 +295,31 @@ def products(request):
     return render(request, 'products.html')
 
 
+def purchased_history(request):
+    products = []
+    if 'user' in request.session:
+        username = request.session.get('user')
+        user = User.objects.get(username=username)
+        purchase_history = PurchaseHistory.objects.filter(user=user)
+
+        for history in purchase_history:
+            products.append(history.product)
+    else:
+        return redirect('login')
+    return render(request, 'purchased_history.html',
+                  {'user': user, 'products': products, 'purchase_history': purchase_history})
+
+
 def add_to_cart(request):
     if 'user' in request.session:
         username = request.session.get('user')
         user = User.objects.get(username=username)
         user_profile = UserProfile.objects.get(user=user)
+        purchased_history = PurchaseHistory.objects.filter(user=user)
     else:
         return redirect('login')
-    return render(request, 'add_to_cart.html', {'user': user, 'user_profile': user_profile})
+    return render(request, 'add_to_cart.html',
+                  {'user': user, 'user_profile': user_profile, 'purchased_history': purchased_history})
 
 
 def profile(request):
@@ -306,15 +371,6 @@ def about(request):
     return render(request, 'about.html', {'user': user, 'user_profile': user_profile})
 
 
-def purchased_history(request):
-    if 'user' in request.session:
-        username = request.session.get('user')
-        user = User.objects.get(username=username)
-    else:
-        return redirect('login')
-    return render(request, 'purchased_history.html', {'user': user})
-
-
 def side_nav(request):
     return render(request, 'side_nav.html')
 
@@ -331,6 +387,7 @@ def add_product(request):
             product_price = request.POST['product_price']
             product_rating = request.POST['product_rating']
             product_image = request.FILES['product_image']
+            seller_name = user.first_name
 
             product = Product.objects.create(
                 user=user,
@@ -339,13 +396,12 @@ def add_product(request):
                 product_description=product_description,
                 product_price=product_price,
                 product_rating=product_rating,
-                product_image=product_image
+                product_image=product_image,
+                seller_name=seller_name,
             )
-            print(product)
     else:
         return redirect('login')
     return render(request, 'add_product.html', {'user': user, 'user_profile': user_profile})
-    return render(request, 'add_product.html')
 
 
 def details(request):
@@ -353,9 +409,12 @@ def details(request):
         username = request.session.get('user')
         user = User.objects.get(username=username)
         user_profile = UserProfile.objects.get(user=user)
+        if user_profile.roles == 'Seller':
+            seller_details = UserProfile.objects.filter(roles='Seller').select_related('user')
     else:
         return redirect('login')
-    return render(request, 'details.html', {'user': user, 'user_profile': user_profile})
+    return render(request, 'details.html',
+                  {'user': user, 'user_profile': user_profile, 'seller_details': seller_details})
 
 
 def products_hist(request):
@@ -384,20 +443,19 @@ def profile_seller(request):
 
 def verification(request):
     # Retrieve user and verification link from session
-    user_id = request.session.get('user_id')
+    user_id = request.session.get('user')
     verification_link = request.session.get('verification_link')
 
     # Get the user object using the user_id
-    user = User.objects.get(id=user_id)
+    user = User.objects.get(username=user_id)
 
     # Render the verification template with user and verification link
-    return render(request, 'verification.html', {'user': user, 'verification_link': verification_link})
+    return render(request, 'resend.html', {'user': user, 'verification_link': verification_link})
 
 
 def generate_pdf(request):
     # Create a file-like buffer to receive PDF data.
     buffer = io.BytesIO()
-
     p = canvas.Canvas(buffer)
 
     # Draw content on the PDF.
@@ -408,25 +466,44 @@ def generate_pdf(request):
     p.drawString(450, 700, "Quantity")
     p.drawString(550, 700, "Total")
 
-    # Example product details (replace with actual data)
-    prods = [
-        {"title": "Dingo Dog Bones", "price": "$12.99", "quantity": "2", "total": "$25.98"},
-        {"title": "Nutro™ Adult Lamb and Rice Dog Food", "price": "$45.99", "quantity": "1", "total": "$45.99"},
-        {"title": "Nutro™ Adult Lamb and Rice Dog Food", "price": "$45.99", "quantity": "1", "total": "$45.99"}
-    ]
-    y = 680
-    for product in prods:
-        y -= 20
-        p.drawString(100, y, product["title"])
-        p.drawString(350, y, product["price"])
-        p.drawString(450, y, product["quantity"])
-        p.drawString(550, y, product["total"])
+    # Get the user from the session
+    username = request.session.get('user')
+    user = User.objects.get(username=username)
 
-    # Add subtotal, tax, shipping, and grand total
-    p.drawString(100, y - 30, "Subtotal: $71.97")
-    p.drawString(100, y - 50, "Tax (5%): $3.60")
-    p.drawString(100, y - 70, "Shipping: $15.00")
-    p.drawString(100, y - 90, "Grand Total: $90.57")
+    # Retrieve the user's purchase history
+    prods = PurchaseHistory.objects.filter(user=user)
+
+    # Initialize variables for subtotal calculation
+    subtotal = 0
+    y = 680
+
+    # Iterate over each purchased product
+    for product in prods:
+        # Retrieve product details
+        title = product.product.product_name
+        price = product.product.product_price
+        quantity = product.quantity
+        total = float(price) * quantity
+        subtotal += total
+
+        # Draw product details on the PDF
+        y -= 20
+        p.drawString(100, y, title)
+        p.drawString(350, y, str(price))
+        p.drawString(450, y, str(quantity))
+        p.drawString(550, y, "${:.2f}".format(total))
+
+    # Calculate tax, shipping, and grand total
+    tax_rate = 0.05
+    tax = subtotal * tax_rate
+    shipping = 15.00
+    grand_total = subtotal + tax + shipping
+
+    # Draw subtotal, tax, shipping, and grand total
+    p.drawString(100, y - 30, "Subtotal: ${:.2f}".format(subtotal))
+    p.drawString(100, y - 50, "Tax (5%): ${:.2f}".format(tax))
+    p.drawString(100, y - 70, "Shipping: ${:.2f}".format(shipping))
+    p.drawString(100, y - 90, "Grand Total: ${:.2f}".format(grand_total))
 
     # Close the PDF object cleanly.
     p.showPage()

@@ -14,7 +14,7 @@
         <div id="verification-form-content">
             <h2>Email Verification</h2>
             <p>An email has been sent to your mail. Please verify it.</p>
-            <form action="verification" method="post">
+            <form action="{% url 'resend'%}" method="post">
                 {% csrf_token %}
                 <button type="submit" id="resend-btn">Resend Mail</button>
             </form>

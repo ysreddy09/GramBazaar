@@ -20,7 +20,7 @@
                     <div class="">Remove</div>
                     <div class="">Total</div>
                 </div>
-                {% for item in cart_items %}
+                {% for item in purchased_history %}
                     <div class="product">
                         <div class="product-image">
                             <img src="{{ item.product.product_image.url }}">
@@ -30,12 +30,12 @@
                         </div>
                         <div class="product-price">{{ item.product.product_price }}</div>
                         <div class="product-quantity">
-                            <input type="number" value="{{ item.quantity }}" min="1" data-product-id="{{ item.product.id }}">
+                            <input type="number" value="1" min="1" data-product-id="{{ item.product.id }}">
                         </div>
                         <div class="product-removal">
                             <button class="remove-product" data-product-id="{{ item.product.id }}">Remove</button>
                         </div>
-                        <div class="product-line-price">{{ item.total_price }}</div>
+                        <div class="product-line-price">{{item.product.product_price}}</div>
                     </div>
                 {% endfor %}
                 <div class="totals">
